@@ -29,3 +29,5 @@ loop over array
         90 -> x + Number
         180 -> y - Number
         270 -> x - Number
+Calculate distance from 0,0 to new location (sum of absolute values of 
+differences in both coordinates)
