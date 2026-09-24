@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <math.h>
 
 struct Waypoint {
     int x;
@@ -11,7 +12,8 @@ struct Waypoint {
 };
 
 void set_direction(struct Waypoint* wp, char c);
-void set_length(struct Waypoint* wp, char c);
+int set_length(struct Waypoint* wp, char* array, int pos);
+int calculate_distance(int x1, int y1, int x2, int y2);
 
 int read_file(char* file_name, char* array){
     FILE *fp = fopen(file_name, "r");
@@ -40,22 +42,32 @@ void set_direction(struct Waypoint* wp, char c){
             printf("Setting direction failed!");
             abort();
         }
+
+        if(wp->direction < 0){
+            wp->direction += 360;
+        }
+
         printf("Direction: %d ", wp->direction);
 }
 
-void set_length(struct Waypoint* wp, char c){
-    c++;
-    
-    if(!isdigit(c)){
+int calculate_distance(int x1, int y1, int x2, int y2){
+    return fabs(x1 - x2) + fabs(y1 - y2);
+}
+
+int set_length(struct Waypoint* wp, char* array, int pos){
+
+    pos++; // Skiping direction letter (L,R)
+
+    if(!isdigit(array[pos])){
         printf("Not a numeric character!");
         abort();
     }
 
     char num[5] = {'\0'};
     int i = 0;
-    while(isdigit(c)){
-        num[i] = c;
-        c++;i++;
+    while(isdigit(array[pos])){
+        num[i] = array[pos];
+        pos++;i++;
     }
 
     int magnitude = atoi(num);
@@ -77,11 +89,12 @@ void set_length(struct Waypoint* wp, char c){
     }
     printf("Updated Location: %d,%d", wp->x, wp->y);
 
+    return pos;
 }
 
 int main(){
-    char file_name[] = "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day01_input_sample.txt";
-    char array[500];
+    char file_name[] = "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day01_input_full.txt";
+    char array[5000];
     
     int ret = read_file(file_name, array);
     if(ret == 1 ){
@@ -102,12 +115,16 @@ int main(){
         if(c != 'L' && c != 'R'){
             continue;
         };
-
+        
         set_direction(&wp, c);
-        set_length(&wp, c);
+        j = set_length(&wp, array, j);
         printf("\nUpdated Location: %d,%d", wp.x, wp.y);
     }
 
+    int manhattan_distance = calculate_distance(0,0,wp.x, wp.y);
+    printf("\nManhattan Distance: %d", manhattan_distance);
     return 0;
 }
-    
+
+// 1: 318 Incorrect
+// 2: 288 Correct
