@@ -128,3 +128,18 @@ int main(){
 
 // 1: 318 Incorrect
 // 2: 288 Correct
+
+/*
+Bugs:
+
+Problem: When decrementing direction into the negative, the modulo operation (% 360) didnt affect negative values
+Solution: It was solved by an if statement (dir < 0) then dir+360, effectivly capping the dir 0-360
+
+Problem: The algorithm stopped short.
+Solution: Array was too small to fit full input. Increased size from 500 to 5000
+
+Problem: The for loop jumped by large steps causing missed characters.
+Solution: Misuse of += instead of using =. Skipped steps in loop. The variable 
+was a index counter, so adding it to eachother was an error.
+
+*/
