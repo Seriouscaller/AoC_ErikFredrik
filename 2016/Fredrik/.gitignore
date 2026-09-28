@@ -56,3 +56,9 @@ dkms.conf
 
 # VS Code settings
 .vscode/
+
+# Autogit
+*autogit.sh
+
+# Notes
+notes.txt
