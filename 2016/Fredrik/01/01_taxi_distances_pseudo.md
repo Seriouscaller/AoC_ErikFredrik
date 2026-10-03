@@ -31,7 +31,7 @@ final distance is simple pythagoras from origin
 typedef struct {
     int64_t x;       
     int64_t y;      
-    int64_t index;  
+    int64_t dir_index;  
 } Position;
 
 const static uint8_t[4] direction_from_ind_arr = {0, 1, 2, 3}; // {east, north, west, south}
