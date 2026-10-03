@@ -5,6 +5,7 @@
  */
 
 // imports
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -14,15 +15,28 @@ typedef struct {
     // uint8_t* sensor1_val_arr;
 } AllocHolder;
 
+typedef struct {
+    int64_t x;
+    int64_t y;
+    int64_t dir_index;
+} Position;
+
+typedef struct {
+    int8_t turn; // -1 or 1
+    uint64_t steps;
+} Opcode;
+
 // prototypes
 void free_alloc(AllocHolder *heap);
+uint8_t direction_from_index(int64_t ind);
 
 int main(void) {
 
-    // initialize memalloc struct
+    // initializing
     AllocHolder heap = {0};
+    Position pos = {0};
+    pos.dir_index = 1;
 
-    // initialize Position and direction_from_ind_arr
     // transform input to opcodes:
     //     find out how many opcodes with rowcolcunt
     //     allocate an array of opcodes
@@ -50,4 +64,11 @@ void free_alloc(AllocHolder *heap) {
     // free(heap->sensor1_val_arr);
     // all other frees here
     memset(heap, 0, sizeof(AllocHolder));
+}
+
+uint8_t direction_from_index(int64_t ind) {
+    static const uint8_t direction_from_ind_arr[] = {0, 1, 2, 3};     // {east, north, west, south}
+    static const uint8_t neg_direction_from_ind_arr[] = {0, 3, 2, 1}; // {east, south, west, north}
+
+    return (ind >= 0) ? direction_from_ind_arr[ind % 4] : neg_direction_from_ind_arr[(-ind) % 4];
 }

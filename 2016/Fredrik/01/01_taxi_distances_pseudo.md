@@ -17,6 +17,7 @@ Direction is like the angle for sin/cos, starting 1 north
     ...
 
 Then we can have the index in an array that will overflow to correct angle
+        obviously this didnt work, but its handled in execution
 
 Turning right: index --
 Turning left:  index ++
@@ -34,7 +35,7 @@ typedef struct {
     int64_t dir_index;  
 } Position;
 
-const static uint8_t[4] direction_from_ind_arr = {0, 1, 2, 3}; // {east, north, west, south}
+static const uint8_t direction_from_ind_arr[] = {0, 1, 2, 3}; // {east, north, west, south}
 
 typedef struct {
     int8_t turn;     // -1 or 1
