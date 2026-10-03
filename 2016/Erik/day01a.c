@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
-#include <math.h>
 
 struct Waypoint {
     int x;
@@ -51,7 +50,7 @@ void set_direction(struct Waypoint* wp, char c){
 }
 
 int calculate_distance(int x1, int y1, int x2, int y2){
-    return fabs(x1 - x2) + fabs(y1 - y2);
+    return abs(x1 - x2) + abs(y1 - y2);
 }
 
 int set_length(struct Waypoint* wp, char* array, int pos){

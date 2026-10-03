@@ -31,3 +31,21 @@ loop over array
         270 -> x - Number
 Calculate distance from 0,0 to new location (sum of absolute values of 
 differences in both coordinates)
+
+
+
+Day 1b
+
+After direction and length has been extracted, traverse the distance step by step
+Each step checking if coordinate already exists,
+if not, adding coordinate to array
+
+While travel_distance < length 
+    Move 1 step
+    save coordinates
+    Search for a duplicate coordinates
+    IF duplicate
+        Print duplicate
+        Exit program
+    ELSE
+        Add coordinate to array
