@@ -11,6 +11,7 @@
 // #define PRINT_INPUT_ANALYSIS
 // #define PRINT_TOKENS
 // #define PRINT_TOKENS_FCN
+// #define PRINT_POSITIONS
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -38,7 +39,7 @@ typedef struct {
 
 //// prototypes ////
 void free_alloc(AllocHolder *heap);
-uint8_t direction_from_index(int64_t ind);
+int8_t direction_from_index(int64_t ind);
 uint8_t analyze_input(const char *inputpath, uint64_t *number_of_opcodes);
 uint8_t rowcol_cunt(
     const char *file_name,
@@ -50,6 +51,7 @@ uint8_t rowcol_cunt(
 ); // imported
 uint8_t fill_array(const char *inputpath, Opcode *opcode_array);
 uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array);
+void move(Position *pos, Opcode *opcode);
 
 int main(void) {
 
@@ -69,8 +71,11 @@ int main(void) {
     Opcode *opcode_array = heap.opcode_array; // Dangerous, opens up to use-after-free
     if (fill_array(inputpath, opcode_array)) goto error;
 
-    // for all opcodes:
-    // move(&Position, opcode_array[i])
+    // execute all movements
+    for (uint64_t i = 0; i < number_of_opcodes; i++) {
+        move(&pos, &(opcode_array[i]));
+    }
+
     // do the pythagoras
 
     goto clean_exit;
@@ -93,7 +98,7 @@ void free_alloc(AllocHolder *heap) {
     memset(heap, 0, sizeof(AllocHolder));
 }
 
-uint8_t direction_from_index(int64_t ind) {
+int8_t direction_from_index(int64_t ind) {
     static const uint8_t direction_from_ind_arr[] = {0, 1, 2, 3};     // {east, north, west, south}
     static const uint8_t neg_direction_from_ind_arr[] = {0, 3, 2, 1}; // {east, south, west, north}
 
@@ -202,4 +207,35 @@ uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array) {
     opcode_array[i] = temp_opcode;
 
     return 0;
+}
+
+void move(Position *pos, Opcode *opcode) {
+#ifdef PRINT_POSITIONS
+    printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+#endif
+    pos->dir_index += opcode->turn;
+    switch (direction_from_index(pos->dir_index)) {
+    default:
+        printf("Invalid direction, cant terminate program\n");
+        break;
+    case 0: { // East
+        pos->x += opcode->steps;
+        break;
+    }
+    case 1: { // North
+        pos->y += opcode->steps;
+        break;
+    }
+    case 2: { // West
+        pos->x -= opcode->steps;
+        break;
+    }
+    case 3: { // South
+        pos->y -= opcode->steps;
+        break;
+    }
+    }
+#ifdef PRINT_POSITIONS
+    printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+#endif
 }
