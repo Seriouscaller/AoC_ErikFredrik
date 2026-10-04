@@ -80,3 +80,22 @@ Position *stop_array = heap.stop_array;
 ### execution
 
 We wing it
+
+## part b attempt 2
+
+After "finishing" partb and debugging and testing testcase i realize its not duplicate STOP, but rather duplicate COORD we visit
+
+I wish i went with the varrays instead, would have made it much easier from here.
+
+### idea
+
+We still use stops array but fill it out with all the coords in between.
+
+We have to reallocate and copy the stop_array as is fills up.
+
+### details
+
+### execution
+
+we wing it
+

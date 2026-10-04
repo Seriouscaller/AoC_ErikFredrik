@@ -5,7 +5,8 @@
  */
 
 //// OPTIONS ////
-#define INPUTPATH "input/01a_input.txt"
+// #define INPUTPATH "input/01a_input.txt"
+#define INPUTPATH "input/01a_input_testcase.txt"
 
 // comment/uncomment sets them
 // #define PRINT_INPUT_ANALYSIS
@@ -292,10 +293,7 @@ void second_stop_check(
     Position *stop_array,
     uint64_t *final_answer1b
 ) {
-    // printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
-    // printf("dup found: %u\n", *duplicate_found);
     const uint64_t nmb_elems_in_stop_array = op_ind + 1; // +1 origo extra elem +1 ind to nmb - 1 we havent added itself
-// printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #ifdef DEBUG_DUPLICATES
     printf("\n");
     printf("analyzing (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
