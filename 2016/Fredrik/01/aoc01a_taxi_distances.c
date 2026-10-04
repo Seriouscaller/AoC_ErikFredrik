@@ -12,9 +12,9 @@
 // #define PRINT_INPUT_ANALYSIS
 // #define PRINT_TOKENS
 // #define PRINT_TOKENS_FCN
-// #define PRINT_POSITIONS
+#define PRINT_POSITIONS
 // #define DEBUG_DUPLICATES
-// #define LIMIT_STEPS 5
+#define LIMIT_STEPS 1
 // #define PRINT_DUPLICATE
 #define ALLOC_MULTIPLIER 1000
 
@@ -268,6 +268,7 @@ void move(
     // Copying position
     pos_old->x = pos->x;
     pos_old->y = pos->y;
+    const uint64_t nmb_elems_in_moved_stop_array = *coord_ind + opcode->steps;
 
 #ifdef PRINT_POSITIONS
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
@@ -282,18 +283,42 @@ void move(
         break;
     case 0: { // East
         pos->x += opcode->steps;
+        for (uint64_t i = *coord_ind; i < nmb_elems_in_moved_stop_array; i++) {
+            stop_array[i].x += 1;
+            stop_array[i].y = pos_old->y;
+            for (uint64_t j = 0; j < i; j++) {
+                if (((stop_array[i]).x == (stop_array[j]).x) && ((stop_array[i]).y == (stop_array[j]).y)) {
+                    printf("DUP\n");
+                    printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", (stop_array[i]).x, (stop_array[i]).x);
+                    *duplicate_found = 1;
+                    *final_answer1b = llabs(pos->x) + llabs(pos->y);
+                }
+            }
+        }
         break;
     }
     case 1: { // North
         pos->y += opcode->steps;
+        for (uint64_t i = *coord_ind; i < nmb_elems_in_moved_stop_array; i++) {
+            stop_array[i].y += 1;
+            stop_array[i].x = pos_old->x;
+        }
         break;
     }
     case 2: { // West
         pos->x -= opcode->steps;
+        for (uint64_t i = *coord_ind; i < nmb_elems_in_moved_stop_array; i++) {
+            stop_array[i].x -= 1;
+            stop_array[i].y = pos_old->y;
+        }
         break;
     }
     case 3: { // South
         pos->y -= opcode->steps;
+        for (uint64_t i = *coord_ind; i < nmb_elems_in_moved_stop_array; i++) {
+            stop_array[i].y -= 1;
+            stop_array[i].x = pos_old->x;
+        }
         break;
     }
     }
