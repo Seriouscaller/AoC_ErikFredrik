@@ -63,14 +63,17 @@ void move(
     uint8_t *duplicate_found,
     uint64_t *final_answer1b,
     const uint64_t op_ind,
-    Position *stop_array
+    Position *stop_array,
+    uint64_t *coord_ind
 );
 void second_stop_check(
     Position *pos,
     uint8_t *duplicate_found,
     const uint64_t op_ind,
     Position *stop_array,
-    uint64_t *final_answer1b
+    uint64_t *final_answer1b,
+    uint64_t *coord_ind,
+    uint64_t steps
 );
 
 int main(void) {
@@ -104,8 +107,9 @@ int main(void) {
     stop_array[0] = pos; // Adding origo since we append on new stop
 
     // execute all movements
+    uint64_t coord_ind = 0;
     for (uint64_t i = 0; i < number_of_opcodes; i++) {
-        move(&pos, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array);
+        move(&pos, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array, &coord_ind);
     }
 
     // do the taxidistance 1a and print answer 1b
@@ -255,7 +259,8 @@ void move(
     uint8_t *duplicate_found,
     uint64_t *final_answer1b,
     const uint64_t op_ind,
-    Position *stop_array
+    Position *stop_array,
+    uint64_t *coord_ind
 ) {
 #ifdef PRINT_POSITIONS
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
@@ -288,7 +293,7 @@ void move(
 #ifdef PRINT_POSITIONS
     printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
-    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, op_ind, stop_array, final_answer1b);
+    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, op_ind, stop_array, final_answer1b, coord_ind, opcode->steps);
 }
 
 void second_stop_check(
@@ -296,9 +301,11 @@ void second_stop_check(
     uint8_t *duplicate_found,
     const uint64_t op_ind,
     Position *stop_array,
-    uint64_t *final_answer1b
+    uint64_t *final_answer1b,
+    uint64_t *coord_ind,
+    uint64_t steps
 ) {
-    const uint64_t nmb_elems_in_stop_array = op_ind + 1; // +1 origo extra elem +1 ind to nmb - 1 we havent added itself
+    const uint64_t nmb_elems_in_stop_array = *coord_ind + steps;
 #ifdef DEBUG_DUPLICATES
     printf("\n");
     printf("analyzing (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
