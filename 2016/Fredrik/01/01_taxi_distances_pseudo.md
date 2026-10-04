@@ -91,7 +91,9 @@ I wish i went with the varrays instead, would have made it much easier from here
 
 We still use stops array but fill it out with all the coords in between.
 
-We have to reallocate and copy the stop_array as is fills up.
+~~We have to reallocate and copy the stop_array as is fills up.~~
+
+I can't be bothered, we try to just bruteforce it with a VERY large stop_array and see if its enough
 
 ### details
 

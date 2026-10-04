@@ -16,6 +16,7 @@
 // #define DEBUG_DUPLICATES
 // #define LIMIT_STEPS 5
 // #define PRINT_DUPLICATE
+#define ALLOC_MULTIPLIER 1000
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -92,8 +93,12 @@ int main(void) {
     Opcode *opcode_array = heap.opcode_array;
     if (fill_array(inputpath, opcode_array)) goto error;
 
-    // allocate for stops
-    heap.stop_array = malloc((number_of_opcodes + 1) * sizeof(Position));
+// allocate for stops
+#ifndef ALLOC_MULTIPLIER
+    printf("ALLOC_MULTIPLIER needed\n");
+    goto error;
+#endif
+    heap.stop_array = malloc((number_of_opcodes + 1) * ALLOC_MULTIPLIER * sizeof(Position));
     if (!heap.stop_array) goto error;
     Position *stop_array = heap.stop_array;
     stop_array[0] = pos; // Adding origo since we append on new stop
