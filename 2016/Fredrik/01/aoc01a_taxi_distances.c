@@ -59,6 +59,7 @@ uint8_t fill_array(const char *inputpath, Opcode *opcode_array);
 uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array);
 void move(
     Position *pos,
+    Position *pos_old,
     Opcode *opcode,
     uint8_t *duplicate_found,
     uint64_t *final_answer1b,
@@ -80,8 +81,9 @@ int main(void) {
 
     // initialize
     AllocHolder heap = {0};
-    Position pos = {0}; // Start in origo
-    pos.dir_index = 1;  // Start pointing north
+    Position pos = {0};     // Start in origo
+    pos.dir_index = 1;      // Start pointing north
+    Position pos_old = {0}; // Start in origo
     uint64_t final_answer1b = 0;
     uint8_t duplicate_found = 0;
 
@@ -109,7 +111,7 @@ int main(void) {
     // execute all movements
     uint64_t coord_ind = 0;
     for (uint64_t i = 0; i < number_of_opcodes; i++) {
-        move(&pos, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array, &coord_ind);
+        move(&pos, &pos_old, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array, &coord_ind);
     }
 
     // do the taxidistance 1a and print answer 1b
@@ -255,6 +257,7 @@ uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array) {
 
 void move(
     Position *pos,
+    Position *pos_old,
     Opcode *opcode,
     uint8_t *duplicate_found,
     uint64_t *final_answer1b,
@@ -262,6 +265,10 @@ void move(
     Position *stop_array,
     uint64_t *coord_ind
 ) {
+    // Copying position
+    pos_old->x = pos->x;
+    pos_old->y = pos->y;
+
 #ifdef PRINT_POSITIONS
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
@@ -293,7 +300,15 @@ void move(
 #ifdef PRINT_POSITIONS
     printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
-    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, op_ind, stop_array, final_answer1b, coord_ind, opcode->steps);
+    if (!(*duplicate_found)) second_stop_check(
+        pos,
+        duplicate_found,
+        op_ind,
+        stop_array,
+        final_answer1b,
+        coord_ind,
+        opcode->steps
+    );
 }
 
 void second_stop_check(
