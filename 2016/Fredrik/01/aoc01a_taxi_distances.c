@@ -52,7 +52,8 @@ uint8_t rowcol_cunt(
 ); // imported
 uint8_t fill_array(const char *inputpath, Opcode *opcode_array);
 uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array);
-void move(Position *pos, Opcode *opcode);
+void move(Position *pos, Opcode *opcode, uint8_t *duplicate_found, uint64_t *final_answer1b, const uint64_t nmb_op);
+void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t nmb_op);
 
 int main(void) {
 
@@ -78,15 +79,20 @@ int main(void) {
     heap.stop_array = malloc((number_of_opcodes + 1) * sizeof(Position));
     if (!heap.stop_array) goto error;
     Position *stop_array = heap.stop_array;
+    stop_array[0] = pos; // Adding origo since we append on new stop
 
     // execute all movements
     for (uint64_t i = 0; i < number_of_opcodes; i++) {
-        move(&pos, &(opcode_array[i]));
+        move(&pos, &(opcode_array[i]), &duplicate_found, &final_answer1b, number_of_opcodes);
     }
 
-    // do the taxidistance
+    // do the taxidistance 1a and print answer 1b
     uint64_t final_answer1a = llabs(pos.x) + llabs(pos.y);
     printf("Answer 1a:% " PRId64 "\n", final_answer1a);
+    if (duplicate_found)
+        printf("HQ distance: %" PRId64 "\n", final_answer1b);
+    else
+        printf("No HQ found\n");
     printf("\n");
 
     goto clean_exit;
@@ -221,14 +227,14 @@ uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array) {
     return 0;
 }
 
-void move(Position *pos, Opcode *opcode) {
+void move(Position *pos, Opcode *opcode, uint8_t *duplicate_found, uint64_t *final_answer1b, const uint64_t nmb_op) {
 #ifdef PRINT_POSITIONS
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
     pos->dir_index += opcode->turn;
     switch (direction_from_index(pos->dir_index)) {
     default:
-        printf("Invalid direction, cant terminate program\n");
+        printf("Invalid direction, can't terminate program\n");
         break;
     case 0: { // East
         pos->x += opcode->steps;
@@ -250,4 +256,11 @@ void move(Position *pos, Opcode *opcode) {
 #ifdef PRINT_POSITIONS
     printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
+    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, nmb_op);
+}
+
+void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t nmb_op) {
+    // printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+    // printf("dup found: %u\n", *duplicate_found);
+    const uint64_t nmb_elems_in_stop_array = nmb_op + 1; // +1 bc origo extra elem
 }
