@@ -56,3 +56,27 @@ for all opcodes:
     move(&Position, opcode_array[i])
 ```
 do the pythagoras
+
+## part b
+
+### idea
+
+We store all the positions we have been in whenever we finish a move. As a stop (Position struct), we waste the direction but lets not bother.
+
+We could use varrays but I think its easier to just use an allocated array of size (number_of_opcodes + 1(startpos))
+
+So after a store look for duplicate stop if not found already
+
+### details
+
+```c
+uint8_t duplicate_found = 0;
+
+heap.stop_array = malloc((number_of_opcodes + 1) = * sizeof(Position));
+if (!heap.stop_array) goto error;
+Position *stop_array = heap.stop_array;
+```
+
+### execution
+
+We wing it
