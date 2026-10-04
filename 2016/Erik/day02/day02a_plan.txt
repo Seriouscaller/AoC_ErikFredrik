@@ -1,0 +1,25 @@
+The document goes on to explain that each button to be pressed can be found by starting on the previous button and moving to adjacent buttons on the keypad: U moves up, D moves down, L moves left, and R moves right. Each line of instructions corresponds to one button, starting at the previous button (or, for the first line, the "5" button); press whatever button you're on at the end of each line. If a move doesn't lead to a button, ignore it.
+
+1 2 3
+4 5 6
+7 8 9
+
+ULL
+RRDDD
+LURDL
+UUUUD
+
+Keep track of digit. 
+
+Start at digit 5.
+If movement down = add 3
+    check first if digit not 7,8 or 9
+if movement up =   subtract 3
+    check first if digit not 1,2 or 3
+if movement right = add 1
+    check first if digit not 3,6 or 9
+if movement left remove 1
+    check first if digit not 1,4 or 7
+
+Function should finish one row until linebreak, then return final digit. 
+Keep running a whileloop until '/0'
