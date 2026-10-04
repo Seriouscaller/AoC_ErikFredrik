@@ -13,6 +13,7 @@
 // #define PRINT_TOKENS_FCN
 // #define PRINT_POSITIONS
 #define DEBUG_DUPLICATES
+#define LIMIT_STEPS 5
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -245,6 +246,9 @@ void move(
 ) {
 #ifdef PRINT_POSITIONS
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+#endif
+#ifdef LIMIT_STEPS
+    if (op_ind > LIMIT_STEPS) return;
 #endif
     pos->dir_index += opcode->turn;
     switch (direction_from_index(pos->dir_index)) {
