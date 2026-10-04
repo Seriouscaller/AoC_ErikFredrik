@@ -4,6 +4,7 @@
 
 ### idea
 
+```
 Im thinking of having one struct for the person, where it has the coordinates and current direction. 
 
 Coordinates [X, Y] starts at [0, 0] at start.
@@ -28,6 +29,7 @@ final distance is simple pythagoras from origin
 
 ### details
 
+```
 ```c
 typedef struct {
     int64_t x;       
