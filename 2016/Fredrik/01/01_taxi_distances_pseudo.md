@@ -27,9 +27,10 @@ and a function pointer-taking old pos, applying opcode, new position
 
 final distance is simple pythagoras from origin
 
+```
+
 ### details
 
-```
 ```c
 typedef struct {
     int64_t x;       
@@ -47,6 +48,7 @@ typedef struct {
 
 ### execution
 
+```
 initialize memalloc struct
 initialize Position and direction_from_ind_arr
 transform input to opcodes:
@@ -54,21 +56,22 @@ transform input to opcodes:
     allocate an array of opcodes
     fill the array with a modified rowcolcunt
 for all opcodes:
-```
     move(&Position, opcode_array[i])
-```
 do the pythagoras
+```
 
 ## part b
 
 ### idea
 
+```
 We store all the positions we have been in whenever we finish a move. As a stop (Position struct), we waste the direction but lets not bother.
 
 We could use varrays but I think its easier to just use an allocated array of size (number_of_opcodes + 1(startpos))
 
 So after a store look for duplicate stop if not found already
 
+```
 ### details
 
 ```c
@@ -80,26 +83,36 @@ Position *stop_array = heap.stop_array;
 ```
 
 ### execution
+```
 
 We wing it
 
+```
 ## part b attempt 2
 
+```
 After "finishing" partb and debugging and testing testcase i realize its not duplicate STOP, but rather duplicate COORD we visit
 
 I wish i went with the varrays instead, would have made it much easier from here.
 
+```
 ### idea
 
+```
 We still use stops array but fill it out with all the coords in between.
 
+```
 ~~We have to reallocate and copy the stop_array as is fills up.~~
+```
 
 I can't be bothered, we try to just bruteforce it with a VERY large stop_array and see if its enough
 
+```
 ### details
 
 ### execution
+```
 
 we wing it
 
+```
