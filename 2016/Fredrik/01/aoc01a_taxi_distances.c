@@ -68,7 +68,7 @@ int main(void) {
     // transform input to opcodes:
     heap.opcode_array = malloc(number_of_opcodes * sizeof(Opcode));
     if (!heap.opcode_array) goto error;
-    Opcode *opcode_array = heap.opcode_array; // Dangerous, opens up to use-after-free
+    Opcode *opcode_array = heap.opcode_array;
     if (fill_array(inputpath, opcode_array)) goto error;
 
     // execute all movements
@@ -76,7 +76,10 @@ int main(void) {
         move(&pos, &(opcode_array[i]));
     }
 
-    // do the pythagoras
+    // do the taxidistance
+    uint64_t final_answer1a = llabs(pos.x) + llabs(pos.y);
+    printf("Answer 1a:% " PRId64 "\n", final_answer1a);
+    printf("\n");
 
     goto clean_exit;
 
@@ -106,11 +109,11 @@ int8_t direction_from_index(int64_t ind) {
 }
 
 uint8_t analyze_input(const char *inputpath, uint64_t *number_of_opcodes) {
-
     uint64_t number_of_rows;
     uint64_t number_of_cols;
     int64_t elem_max;
     int64_t elem_min;
+
 #ifdef PRINT_INPUT_ANALYSIS
     const uint8_t print = 1;
 #else
