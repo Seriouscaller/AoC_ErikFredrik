@@ -12,6 +12,7 @@
 // #define PRINT_TOKENS
 // #define PRINT_TOKENS_FCN
 // #define PRINT_POSITIONS
+#define DEBUG_DUPLICATES
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -52,8 +53,15 @@ uint8_t rowcol_cunt(
 ); // imported
 uint8_t fill_array(const char *inputpath, Opcode *opcode_array);
 uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array);
-void move(Position *pos, Opcode *opcode, uint8_t *duplicate_found, uint64_t *final_answer1b, const uint64_t nmb_op);
-void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t nmb_op);
+void move(
+    Position *pos,
+    Opcode *opcode,
+    uint8_t *duplicate_found,
+    uint64_t *final_answer1b,
+    const uint64_t op_ind,
+    Position *stop_array
+);
+void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t op_ind, Position *stop_array);
 
 int main(void) {
 
@@ -83,7 +91,7 @@ int main(void) {
 
     // execute all movements
     for (uint64_t i = 0; i < number_of_opcodes; i++) {
-        move(&pos, &(opcode_array[i]), &duplicate_found, &final_answer1b, number_of_opcodes);
+        move(&pos, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array);
     }
 
     // do the taxidistance 1a and print answer 1b
@@ -227,7 +235,14 @@ uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array) {
     return 0;
 }
 
-void move(Position *pos, Opcode *opcode, uint8_t *duplicate_found, uint64_t *final_answer1b, const uint64_t nmb_op) {
+void move(
+    Position *pos,
+    Opcode *opcode,
+    uint8_t *duplicate_found,
+    uint64_t *final_answer1b,
+    const uint64_t op_ind,
+    Position *stop_array
+) {
 #ifdef PRINT_POSITIONS
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
@@ -256,11 +271,21 @@ void move(Position *pos, Opcode *opcode, uint8_t *duplicate_found, uint64_t *fin
 #ifdef PRINT_POSITIONS
     printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
-    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, nmb_op);
+    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, op_ind, stop_array);
 }
 
-void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t nmb_op) {
+void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t op_ind, Position *stop_array) {
     // printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
     // printf("dup found: %u\n", *duplicate_found);
-    const uint64_t nmb_elems_in_stop_array = nmb_op + 1; // +1 bc origo extra elem
+    const uint64_t nmb_elems_in_stop_array = op_ind + 2; // +1 origo extra elem +1 ind to nmb
+// printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+#ifdef DEBUG_DUPLICATES
+    printf("\n");
+    printf("analyzing (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+#endif
+    for (uint64_t i = 0; i < nmb_elems_in_stop_array; i++) {
+        if ((pos->x == (stop_array[i]).x) && (pos->y == (stop_array[i]).y)) {
+            printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+        }
+    }
 }
