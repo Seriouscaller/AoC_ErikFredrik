@@ -35,6 +35,7 @@ typedef struct {
 typedef struct {
     // holds all allocated memory, all pointers of course
     Opcode *opcode_array;
+    Position *stop_array;
 } AllocHolder;
 
 //// prototypes ////
@@ -59,6 +60,8 @@ int main(void) {
     AllocHolder heap = {0};
     Position pos = {0}; // Start in origo
     pos.dir_index = 1;  // Start pointing north
+    uint64_t final_answer1b = 0;
+    uint8_t duplicate_found = 0;
 
     // analyze input
     char *inputpath = INPUTPATH;
@@ -70,6 +73,11 @@ int main(void) {
     if (!heap.opcode_array) goto error;
     Opcode *opcode_array = heap.opcode_array;
     if (fill_array(inputpath, opcode_array)) goto error;
+
+    // allocate for stops
+    heap.stop_array = malloc((number_of_opcodes + 1) * sizeof(Position));
+    if (!heap.stop_array) goto error;
+    Position *stop_array = heap.stop_array;
 
     // execute all movements
     for (uint64_t i = 0; i < number_of_opcodes; i++) {
@@ -97,6 +105,7 @@ void free_alloc(AllocHolder *heap) {
 
     if (!heap) return;
     free(heap->opcode_array);
+    free(heap->stop_array);
     // all other frees here
     memset(heap, 0, sizeof(AllocHolder));
 }

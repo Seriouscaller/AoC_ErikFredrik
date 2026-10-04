@@ -72,7 +72,7 @@ So after a store look for duplicate stop if not found already
 ```c
 uint8_t duplicate_found = 0;
 
-heap.stop_array = malloc((number_of_opcodes + 1) = * sizeof(Position));
+heap.stop_array = malloc((number_of_opcodes + 1) * sizeof(Position));
 if (!heap.stop_array) goto error;
 Position *stop_array = heap.stop_array;
 ```
