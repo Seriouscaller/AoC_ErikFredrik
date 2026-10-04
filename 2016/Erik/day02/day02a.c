@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "keypad.h"
 
 #define ARR_SIZE 5000
 
@@ -19,33 +20,6 @@ int read_file(char* file_name, char* array){
     fclose(fp);
 
     return 0;
-}
-
-int move(char c, int digit){
-    switch (c) {
-        case 'U':
-            if((3 < digit)){
-                digit -= 3;
-            }
-            break;
-        case 'D':
-            if((7 > digit)){
-                digit += 3;
-            }
-            break;
-        case 'R':
-            if(!(digit % 3 == 0)){
-                digit++;
-            }
-            break;
-        case 'L':
-            if(!(digit % 3 == 1)){
-                digit--;
-            }
-        break;
-    };
-
-    return digit;
 }
 
 int main(){
