@@ -284,6 +284,9 @@ void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t o
     printf("analyzing (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
     for (uint64_t i = 0; i < nmb_elems_in_stop_array; i++) {
+#ifdef DEBUG_DUPLICATES
+        printf("(x-pos, x-stoparr): (%" PRId64 ", %" PRId64 ")\n", pos->x, stop_array[i].x);
+#endif
         if ((pos->x == (stop_array[i]).x) && (pos->y == (stop_array[i]).y)) {
             printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
             *duplicate_found = 1;
