@@ -12,8 +12,9 @@
 // #define PRINT_TOKENS
 // #define PRINT_TOKENS_FCN
 // #define PRINT_POSITIONS
-#define DEBUG_DUPLICATES
-#define LIMIT_STEPS 5
+// #define DEBUG_DUPLICATES
+// #define LIMIT_STEPS 5
+// #define PRINT_DUPLICATE
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -62,7 +63,13 @@ void move(
     const uint64_t op_ind,
     Position *stop_array
 );
-void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t op_ind, Position *stop_array);
+void second_stop_check(
+    Position *pos,
+    uint8_t *duplicate_found,
+    const uint64_t op_ind,
+    Position *stop_array,
+    uint64_t *final_answer1b
+);
 
 int main(void) {
 
@@ -99,7 +106,7 @@ int main(void) {
     uint64_t final_answer1a = llabs(pos.x) + llabs(pos.y);
     printf("Answer 1a:% " PRId64 "\n", final_answer1a);
     if (duplicate_found)
-        printf("HQ distance: %" PRId64 "\n", final_answer1b);
+        printf("Answer 1b: %" PRId64 "\n", final_answer1b);
     else
         printf("No HQ found\n");
     printf("\n");
@@ -275,13 +282,19 @@ void move(
 #ifdef PRINT_POSITIONS
     printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
-    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, op_ind, stop_array);
+    if (!(*duplicate_found)) second_stop_check(pos, duplicate_found, op_ind, stop_array, final_answer1b);
 }
 
-void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t op_ind, Position *stop_array) {
+void second_stop_check(
+    Position *pos,
+    uint8_t *duplicate_found,
+    const uint64_t op_ind,
+    Position *stop_array,
+    uint64_t *final_answer1b
+) {
     // printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
     // printf("dup found: %u\n", *duplicate_found);
-    const uint64_t nmb_elems_in_stop_array = op_ind + 2; // +1 origo extra elem +1 ind to nmb
+    const uint64_t nmb_elems_in_stop_array = op_ind + 1; // +1 origo extra elem +1 ind to nmb - 1 we havent added itself
 // printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #ifdef DEBUG_DUPLICATES
     printf("\n");
@@ -292,9 +305,14 @@ void second_stop_check(Position *pos, uint8_t *duplicate_found, const uint64_t o
         printf("(x-pos, x-stoparr): (%" PRId64 ", %" PRId64 ")\n", pos->x, stop_array[i].x);
 #endif
         if ((pos->x == (stop_array[i]).x) && (pos->y == (stop_array[i]).y)) {
+#ifdef PRINT_DUPLICATE
             printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+#endif
             *duplicate_found = 1;
-            uint64_t final_answer1b = llabs(pos->x) + llabs(pos->y);
+            *final_answer1b = llabs(pos->x) + llabs(pos->y);
         }
     }
+    stop_array[op_ind + 1].x = pos->x;
+    stop_array[op_ind + 1].y = pos->y;
+    stop_array[op_ind + 1].dir_index = pos->dir_index;
 }
