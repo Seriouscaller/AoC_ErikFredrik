@@ -1,17 +1,26 @@
 /**
- * @file /home/grisen/projects/advent_of_code/2016/AoC_ErikFredrik/2016/Fredrik/01/aoc01a_taxi_distances.c
+ * @file /home/grisen/projects/advent_of_code/2016/AoC_ErikFredrik/2016/Fredrik/01/aoc01b_taxi_distances.c
  * @date 2026-10-03
  * @brief finding taxidistance from drop
  */
 
+// make the movestepper a function
+// make the movestepper call function looking for duplicate
+
 //// OPTIONS ////
-#define INPUTPATH "input/01a_input.txt"
+// #define INPUTPATH "input/01a_input.txt"
+#define INPUTPATH "input/01a_input_testcase.txt"
 
 // comment/uncomment sets them
+// #define PRINT_ANSWER_A
 // #define PRINT_INPUT_ANALYSIS
 // #define PRINT_TOKENS
 // #define PRINT_TOKENS_FCN
-// #define PRINT_POSITIONS
+#define PRINT_POSITIONS
+// #define DEBUG_DUPLICATES
+#define LIMIT_STEPS 1
+// #define PRINT_DUPLICATE
+#define ALLOC_MULTIPLIER 150
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -35,6 +44,7 @@ typedef struct {
 typedef struct {
     // holds all allocated memory, all pointers of course
     Opcode *opcode_array;
+    Position *stop_array;
 } AllocHolder;
 
 //// prototypes ////
@@ -51,14 +61,26 @@ uint8_t rowcol_cunt(
 ); // imported
 uint8_t fill_array(const char *inputpath, Opcode *opcode_array);
 uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array);
-void move(Position *pos, Opcode *opcode);
+void move(
+    Position *pos,
+    Position *pos_old,
+    Opcode *opcode,
+    uint8_t *duplicate_found,
+    uint64_t *final_answer1b,
+    const uint64_t op_ind,
+    Position *stop_array,
+    uint64_t *stop_arr_ind
+);
 
 int main(void) {
 
     // initialize
     AllocHolder heap = {0};
-    Position pos = {0}; // Start in origo
-    pos.dir_index = 1;  // Start pointing north
+    Position pos = {0};     // Start in origo, pos is the full-stepper
+    pos.dir_index = 1;      // Start pointing north
+    Position pos_old = {0}; // Start in origo, pos_old is the crawler
+    uint64_t final_answer1b = 0;
+    uint8_t duplicate_found = 0;
 
     // analyze input
     char *inputpath = INPUTPATH;
@@ -71,15 +93,31 @@ int main(void) {
     Opcode *opcode_array = heap.opcode_array;
     if (fill_array(inputpath, opcode_array)) goto error;
 
+// allocate for stops
+#ifndef ALLOC_MULTIPLIER // this really should check >= 1
+    printf("ALLOC_MULTIPLIER needed\n");
+    goto error;
+#endif
+    heap.stop_array = malloc((number_of_opcodes + 1) * ALLOC_MULTIPLIER * sizeof(Position));
+    if (!heap.stop_array) goto error;
+    Position *stop_array = heap.stop_array;
+    stop_array[0] = pos;       // Adding origo since we append on new stop
+    uint64_t stop_arr_ind = 1; // origo
+
     // execute all movements
     for (uint64_t i = 0; i < number_of_opcodes; i++) {
-        move(&pos, &(opcode_array[i]));
+        move(&pos, &pos_old, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array, &stop_arr_ind);
     }
 
-    // do the pythagoras
-    // do the taxidistance
+    // do the taxidistance 1a and print answer 1b
     uint64_t final_answer1a = llabs(pos.x) + llabs(pos.y);
+#ifdef PRINT_ANSWER_A
     printf("Answer 1a:% " PRId64 "\n", final_answer1a);
+#endif
+    if (duplicate_found)
+        printf("Answer 1b: %" PRId64 "\n", final_answer1b);
+    else
+        printf("No HQ found\n");
     printf("\n");
 
     goto clean_exit;
@@ -98,6 +136,7 @@ void free_alloc(AllocHolder *heap) {
 
     if (!heap) return;
     free(heap->opcode_array);
+    free(heap->stop_array);
     // all other frees here
     memset(heap, 0, sizeof(AllocHolder));
 }
@@ -110,7 +149,6 @@ int8_t direction_from_index(int64_t ind) {
 }
 
 uint8_t analyze_input(const char *inputpath, uint64_t *number_of_opcodes) {
-
     uint64_t number_of_rows;
     uint64_t number_of_cols;
     int64_t elem_max;
@@ -214,17 +252,56 @@ uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array) {
     return 0;
 }
 
-void move(Position *pos, Opcode *opcode) {
+void move(
+    Position *pos,
+    Position *pos_old,
+    Opcode *opcode,
+    uint8_t *duplicate_found,
+    uint64_t *final_answer1b,
+    const uint64_t op_ind,
+    Position *stop_array,
+    uint64_t *stop_arr_ind
+) {
+
 #ifdef PRINT_POSITIONS
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
+#endif
+#ifdef LIMIT_STEPS
+    if (op_ind > LIMIT_STEPS) return;
 #endif
     pos->dir_index += opcode->turn;
     switch (direction_from_index(pos->dir_index)) {
     default:
-        printf("Invalid direction, cant terminate program\n");
+        printf("Invalid direction, can't terminate program\n");
         break;
     case 0: { // East
         pos->x += opcode->steps;
+        if (!*duplicate_found) {
+            while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
+                *stop_arr_ind = *stop_arr_ind + 1;
+                pos_old->x += 1;
+                stop_array[*stop_arr_ind].x = pos_old->x;
+                stop_array[*stop_arr_ind].y = pos_old->y;
+                if (!*duplicate_found) {
+                    // DUPLICATE FCN Goes here
+                    if (*duplicate_found) { // has to be double if, both have to be able to run
+                        *final_answer1b = llabs(pos_old->x) + llabs(pos_old->y);
+                    }
+                }
+            }
+        }
+        // for (uint64_t i = *stop_arr_ind; i < nmb_elems_in_moved_stop_array; i++) {
+        //     stop_array[i].x += 1;
+        //     stop_array[i].y = pos_old->y;
+        //     for (uint64_t j = 0; j < i; j++) {
+        //         if (((stop_array[i]).x == (stop_array[j]).x) && ((stop_array[i]).y == (stop_array[j]).y)) {
+        //             printf("DUP\n");
+        //             printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", (stop_array[i]).x, (stop_array[i]).x);
+        //             *duplicate_found = 1;
+        //             *final_answer1b = llabs(pos->x) + llabs(pos->y);
+        //         }
+        //     }
+        // }
         break;
     }
     case 1: { // North

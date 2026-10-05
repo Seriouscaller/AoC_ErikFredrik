@@ -113,6 +113,10 @@ I can't be bothered, we try to just bruteforce it with a VERY large stop_array a
 ### execution
 ```
 
-we wing it
+~~we wing it.~~
+
+got messy. new idea:
+in the move, we split the actual moving into each steps.
+each step adds its coord to the stop_array and looks for duplicate.
 
 ```
