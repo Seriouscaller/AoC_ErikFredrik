@@ -8,8 +8,8 @@
 // make the movestepper call function looking for duplicate
 
 //// OPTIONS ////
-// #define INPUTPATH "input/01a_input.txt"
-#define INPUTPATH "input/01a_input_testcase.txt"
+#define INPUTPATH "input/01a_input.txt"
+// #define INPUTPATH "input/01a_input_testcase.txt"
 
 // comment/uncomment sets them
 // #define PRINT_ANSWER_A
@@ -17,10 +17,11 @@
 // #define PRINT_TOKENS
 // #define PRINT_TOKENS_FCN
 // #define PRINT_POSITIONS
+// #define PRINT_POSITIONS_CRAWL
 // #define DEBUG_DUPLICATES
 // #define LIMIT_STEPS 1
 // #define PRINT_DUPLICATE
-#define PRINT_DUPLICATE_COORDS
+// #define PRINT_DUPLICATE_COORDS
 #define ALLOC_MULTIPLIER 250
 
 //// imports ////
@@ -276,6 +277,7 @@ void move(
 ) {
 
 #ifdef PRINT_POSITIONS
+    printf("\n");
     printf("Old (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
 #ifdef LIMIT_STEPS
@@ -288,20 +290,20 @@ void move(
         break;
     case 0: { // East
         pos->x += opcode->steps;
-        // if (!*duplicate_found) {
-        //     while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
-        //         *stop_arr_ind = *stop_arr_ind + 1;
-        //         pos_crawler->x += 1;
-        //         stop_array[*stop_arr_ind].x = pos_crawler->x;
-        //         stop_array[*stop_arr_ind].y = pos_crawler->y;
-        //         if (!*duplicate_found) {
-        //             // DUPLICATE FCN Goes here
-        //             if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
-        //                 *final_answer1b = llabs(pos_crawler->x) + llabs(pos_crawler->y);
-        //             }
-        //         }
-        //     }
-        // }
+        if (!*duplicate_found) {
+            while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
+                *stop_arr_ind = *stop_arr_ind + 1;
+                pos_crawler->x += 1;
+                stop_array[*stop_arr_ind].x = pos_crawler->x;
+                stop_array[*stop_arr_ind].y = pos_crawler->y;
+                if (!*duplicate_found) {
+                    // DUPLICATE FCN Goes here
+                    if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
+                        *final_answer1b = llabs(pos_crawler->x) + llabs(pos_crawler->y);
+                    }
+                }
+            }
+        }
         crawl(stop_array, stop_arr_ind, pos, pos_crawler, 1, 0, duplicate_found, final_answer1b);
         break;
     }
@@ -336,12 +338,19 @@ uint8_t crawl(
     uint8_t *duplicate_found,
     uint64_t *final_answer1b
 ) {
-    while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
+#ifdef PRINT_POSITIONS_CRAWL
+    printf("Crawl Started\n");
+#endif
+    while (stop_array[*stop_arr_ind].x != pos->x || stop_array[*stop_arr_ind].y != pos->y) {
+        // printf("Crawl inside while\n");
         *stop_arr_ind = *stop_arr_ind + 1;
         pos_crawler->x += x_change;
         pos_crawler->y += y_change;
         stop_array[*stop_arr_ind].x = pos_crawler->x;
         stop_array[*stop_arr_ind].y = pos_crawler->y;
+#ifdef PRINT_POSITIONS_CRAWL
+        printf("Crawl (x, y): (%" PRId64 ", %" PRId64 ")\n", pos_crawler->x, pos_crawler->y);
+#endif
         if (!*duplicate_found) {
             is_in_array(stop_array, stop_arr_ind, pos_crawler, duplicate_found);
             if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
@@ -359,6 +368,7 @@ uint8_t is_in_array(Position *stop_array, uint64_t *stop_arr_ind, Position *pos_
             printf("Dup (x, y): (%" PRId64 ", %" PRId64 ")\n", pos_crawler->x, pos_crawler->y);
             printf("\n");
 #endif
+            *duplicate_found = 1;
         }
     }
     return 0;
