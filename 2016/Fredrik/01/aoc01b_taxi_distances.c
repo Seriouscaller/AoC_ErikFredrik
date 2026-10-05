@@ -63,7 +63,7 @@ uint8_t fill_array(const char *inputpath, Opcode *opcode_array);
 uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array);
 void move(
     Position *pos,
-    Position *pos_old,
+    Position *pos_crawler,
     Opcode *opcode,
     uint8_t *duplicate_found,
     uint64_t *final_answer1b,
@@ -71,14 +71,24 @@ void move(
     Position *stop_array,
     uint64_t *stop_arr_ind
 );
+uint8_t crawl(
+    Position *stop_array,
+    uint64_t *stop_arr_ind,
+    Position *pos,
+    Position *pos_crawler,
+    int8_t x_change,
+    int8_t y_change,
+    uint8_t *duplicate_found,
+    uint64_t *final_answer1b
+);
 
 int main(void) {
 
     // initialize
     AllocHolder heap = {0};
-    Position pos = {0};     // Start in origo, pos is the full-stepper
-    pos.dir_index = 1;      // Start pointing north
-    Position pos_old = {0}; // Start in origo, pos_old is the crawler
+    Position pos = {0};         // Start in origo, pos is the full-stepper
+    pos.dir_index = 1;          // Start pointing north
+    Position pos_crawler = {0}; // Start in origo, pos_crawler is the crawler
     uint64_t final_answer1b = 0;
     uint8_t duplicate_found = 0;
 
@@ -106,7 +116,7 @@ int main(void) {
 
     // execute all movements
     for (uint64_t i = 0; i < number_of_opcodes; i++) {
-        move(&pos, &pos_old, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array, &stop_arr_ind);
+        move(&pos, &pos_crawler, &(opcode_array[i]), &duplicate_found, &final_answer1b, i, stop_array, &stop_arr_ind);
     }
 
     // do the taxidistance 1a and print answer 1b
@@ -254,7 +264,7 @@ uint8_t set_opcode(const uint64_t i, const char *token, Opcode *opcode_array) {
 
 void move(
     Position *pos,
-    Position *pos_old,
+    Position *pos_crawler,
     Opcode *opcode,
     uint8_t *duplicate_found,
     uint64_t *final_answer1b,
@@ -279,20 +289,20 @@ void move(
         if (!*duplicate_found) {
             while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
                 *stop_arr_ind = *stop_arr_ind + 1;
-                pos_old->x += 1;
-                stop_array[*stop_arr_ind].x = pos_old->x;
-                stop_array[*stop_arr_ind].y = pos_old->y;
+                pos_crawler->x += 1;
+                stop_array[*stop_arr_ind].x = pos_crawler->x;
+                stop_array[*stop_arr_ind].y = pos_crawler->y;
                 if (!*duplicate_found) {
                     // DUPLICATE FCN Goes here
-                    if (*duplicate_found) { // has to be double if, both have to be able to run
-                        *final_answer1b = llabs(pos_old->x) + llabs(pos_old->y);
+                    if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
+                        *final_answer1b = llabs(pos_crawler->x) + llabs(pos_crawler->y);
                     }
                 }
             }
         }
         // for (uint64_t i = *stop_arr_ind; i < nmb_elems_in_moved_stop_array; i++) {
         //     stop_array[i].x += 1;
-        //     stop_array[i].y = pos_old->y;
+        //     stop_array[i].y = pos_crawler->y;
         //     for (uint64_t j = 0; j < i; j++) {
         //         if (((stop_array[i]).x == (stop_array[j]).x) && ((stop_array[i]).y == (stop_array[j]).y)) {
         //             printf("DUP\n");
@@ -320,4 +330,30 @@ void move(
 #ifdef PRINT_POSITIONS
     printf("New (x, y): (%" PRId64 ", %" PRId64 ")\n", pos->x, pos->y);
 #endif
+}
+
+uint8_t crawl(
+    Position *stop_array,
+    uint64_t *stop_arr_ind,
+    Position *pos,
+    Position *pos_crawler,
+    int8_t x_change,
+    int8_t y_change,
+    uint8_t *duplicate_found,
+    uint64_t *final_answer1b
+) {
+    while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
+        *stop_arr_ind = *stop_arr_ind + 1;
+        pos_crawler->x += x_change;
+        pos_crawler->y += y_change;
+        stop_array[*stop_arr_ind].x = pos_crawler->x;
+        stop_array[*stop_arr_ind].y = pos_crawler->y;
+        if (!*duplicate_found) {
+            // DUPLICATE FCN Goes here
+            if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
+                *final_answer1b = llabs(pos_crawler->x) + llabs(pos_crawler->y);
+            }
+        }
+    }
+    return 0;
 }
