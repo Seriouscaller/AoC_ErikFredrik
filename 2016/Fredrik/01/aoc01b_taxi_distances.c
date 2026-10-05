@@ -16,11 +16,12 @@
 // #define PRINT_INPUT_ANALYSIS
 // #define PRINT_TOKENS
 // #define PRINT_TOKENS_FCN
-#define PRINT_POSITIONS
+// #define PRINT_POSITIONS
 // #define DEBUG_DUPLICATES
-#define LIMIT_STEPS 1
+// #define LIMIT_STEPS 1
 // #define PRINT_DUPLICATE
-#define ALLOC_MULTIPLIER 150
+#define PRINT_DUPLICATE_COORDS
+#define ALLOC_MULTIPLIER 250
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -81,6 +82,7 @@ uint8_t crawl(
     uint8_t *duplicate_found,
     uint64_t *final_answer1b
 );
+uint8_t is_in_array(Position *stop_array, uint64_t *stop_arr_ind, Position *pos_crawler, uint8_t *duplicate_found);
 
 int main(void) {
 
@@ -286,44 +288,36 @@ void move(
         break;
     case 0: { // East
         pos->x += opcode->steps;
-        if (!*duplicate_found) {
-            while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
-                *stop_arr_ind = *stop_arr_ind + 1;
-                pos_crawler->x += 1;
-                stop_array[*stop_arr_ind].x = pos_crawler->x;
-                stop_array[*stop_arr_ind].y = pos_crawler->y;
-                if (!*duplicate_found) {
-                    // DUPLICATE FCN Goes here
-                    if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
-                        *final_answer1b = llabs(pos_crawler->x) + llabs(pos_crawler->y);
-                    }
-                }
-            }
-        }
-        // for (uint64_t i = *stop_arr_ind; i < nmb_elems_in_moved_stop_array; i++) {
-        //     stop_array[i].x += 1;
-        //     stop_array[i].y = pos_crawler->y;
-        //     for (uint64_t j = 0; j < i; j++) {
-        //         if (((stop_array[i]).x == (stop_array[j]).x) && ((stop_array[i]).y == (stop_array[j]).y)) {
-        //             printf("DUP\n");
-        //             printf("duplicate (x, y): (%" PRId64 ", %" PRId64 ")\n", (stop_array[i]).x, (stop_array[i]).x);
-        //             *duplicate_found = 1;
-        //             *final_answer1b = llabs(pos->x) + llabs(pos->y);
+        // if (!*duplicate_found) {
+        //     while (stop_array[*stop_arr_ind].x != pos->x && stop_array[*stop_arr_ind].y != pos->y) {
+        //         *stop_arr_ind = *stop_arr_ind + 1;
+        //         pos_crawler->x += 1;
+        //         stop_array[*stop_arr_ind].x = pos_crawler->x;
+        //         stop_array[*stop_arr_ind].y = pos_crawler->y;
+        //         if (!*duplicate_found) {
+        //             // DUPLICATE FCN Goes here
+        //             if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
+        //                 *final_answer1b = llabs(pos_crawler->x) + llabs(pos_crawler->y);
+        //             }
         //         }
         //     }
         // }
+        crawl(stop_array, stop_arr_ind, pos, pos_crawler, 1, 0, duplicate_found, final_answer1b);
         break;
     }
     case 1: { // North
         pos->y += opcode->steps;
+        crawl(stop_array, stop_arr_ind, pos, pos_crawler, 0, 1, duplicate_found, final_answer1b);
         break;
     }
     case 2: { // West
         pos->x -= opcode->steps;
+        crawl(stop_array, stop_arr_ind, pos, pos_crawler, -1, 0, duplicate_found, final_answer1b);
         break;
     }
     case 3: { // South
         pos->y -= opcode->steps;
+        crawl(stop_array, stop_arr_ind, pos, pos_crawler, 0, -1, duplicate_found, final_answer1b);
         break;
     }
     }
@@ -349,10 +343,22 @@ uint8_t crawl(
         stop_array[*stop_arr_ind].x = pos_crawler->x;
         stop_array[*stop_arr_ind].y = pos_crawler->y;
         if (!*duplicate_found) {
-            // DUPLICATE FCN Goes here
+            is_in_array(stop_array, stop_arr_ind, pos_crawler, duplicate_found);
             if (*duplicate_found) { // has to be double if, both have to be able to run, and dup can be fnd in while
                 *final_answer1b = llabs(pos_crawler->x) + llabs(pos_crawler->y);
             }
+        }
+    }
+    return 0;
+}
+
+uint8_t is_in_array(Position *stop_array, uint64_t *stop_arr_ind, Position *pos_crawler, uint8_t *duplicate_found) {
+    for (uint64_t i = 0; i < *stop_arr_ind; i++) { // Can actually happen more than once
+        if (pos_crawler->x == stop_array[i].x && pos_crawler->y == stop_array[i].y) {
+#ifdef PRINT_DUPLICATE_COORDS
+            printf("Dup (x, y): (%" PRId64 ", %" PRId64 ")\n", pos_crawler->x, pos_crawler->y);
+            printf("\n");
+#endif
         }
     }
     return 0;
