@@ -23,3 +23,36 @@ if movement left remove 1
 
 Function should finish one row until linebreak, then return final digit. 
 Keep running a whileloop until '/0'
+
+Day02B:
+
+    1
+  2 3 4
+5 6 7 8 9
+  A B C
+    D
+
+
+Create structs representing a person moving through the dungeon
+typedef struct Person{
+    struct Room* current_location;
+}
+
+When a person moves into a new room, that room is replacing the current_location
+
+void move(struct Room){}
+
+Create structs representing a room
+
+struct Room {
+    char room_id;
+    struct Room* exit_n;
+    struct Room* exit_e;
+    struct Room* exit_s;
+    struct Room* exit_w;
+};
+
+Each exit connects to an adjacent room. If the room is at a wall, 
+the exit against the wall is a null pointer, and if a movement is made against
+a wall (room without an exit in that direction) the persons position
+is not updated.
