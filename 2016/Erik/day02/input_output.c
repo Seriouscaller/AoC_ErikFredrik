@@ -8,7 +8,11 @@ long get_file_size(char* file_name){
         printf("Failed to open file!\n");
         return -1;
     }
-    fseek(fp, 0 , SEEK_END);
+    int ret = fseek(fp, 0 , SEEK_END);
+    if(ret){
+        printf("fseek failed!\n");
+        abort();
+    }
     long size = ftell(fp);
     fclose(fp);
     return size;
