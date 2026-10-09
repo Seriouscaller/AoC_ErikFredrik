@@ -44,3 +44,23 @@ switch(c)
 '\r': carriage return and other stuff: break
 
 ```
+
+## part b
+
+so yeah, alot has to change. Im sure there is some ascii-magic that can be found but i cant think of it straight away
+
+### changes and idea
+
+```
+    1
+  2 3 4
+5 6 7 8 9
+  A B C
+    D
+```
+
+- answer code is now a char array, with its corresponding code_ind = 0
+- position is now char '5' instead of x / y
+- movement will be split into 4 LDUR movefcns taking pos returning pos
+- i will be a little bit lazy with memory management since i know i will only need one alloc
+- atleast i can keep the main-loop
