@@ -245,6 +245,27 @@ uint8_t n_digits_uint16_t(uint16_t number) {
     return n;
 }
 
+/*!
+ * @brief A function for finding the number of digits in a number in base10. for
+ * example 12345 has 5 digits.
+ *
+ * @param[in] number The number in question
+ *
+ * @return the number of digits
+ *
+ * Last updated oct 2026
+ */
+uint8_t n_digits_uint64_t(uint64_t number) {
+    if (number == 0)
+        return 1;
+    uint8_t n = 0;
+    while (number) {
+        number /= 10;
+        n++;
+    }
+    return n;
+}
+
 uint8_t txtfile_to_charmatrix_2d(const char *file_name, char *matrix, const uint64_t rows, const uint64_t cols) {
     FILE *pf;
     pf = fopen(file_name, "r");
