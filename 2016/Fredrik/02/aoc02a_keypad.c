@@ -7,11 +7,11 @@
 
 //// OPTIONS ////
 // #define INPUTPATH "input/02_input_testcase.txt"
-#define INPUTPATH "input/02_input_testcase_nonaccepted_tolonginput.txt"
-// #define INPUTPATH "input/02_input.txt"
+// #define INPUTPATH "input/02_input_testcase_nonaccepted_tolonginput.txt"
+#define INPUTPATH "input/02_input.txt"
 
 // comment/uncomment sets them
-#define VERIFY_INPUT
+// #define VERIFY_INPUT
 // #define PRINT_INPUT_ANALYSIS
 
 //// imports ////
@@ -42,10 +42,52 @@ int main(void) {
     // initialize
     uint8_t x = 2;
     uint8_t y = 1;
+    uint64_t code = 0;
+
+    FILE *pf;
+    pf = fopen(INPUTPATH, "r");
+    if (!pf) {
+        printf("Something wrong with file-opening in main, mayby wrong file-name?");
+        return 1;
+    }
 
     // main loop
+    char c;
+    while ((c = getc(pf)) != EOF) {
+        // printf("%c", c);
+        switch (c) {
+        default:
+            printf("unexpected character: %c, exiting program\n", c);
+            goto error_while_open_file;
+        case 'L':
+            x = (x == 1) ? 1 : x - 1;
+            break;
+        case 'D':
+            y = (y == 2) ? 2 : y + 1;
+            break;
+        case 'U':
+            y = (y == 0) ? 0 : y - 1;
+            break;
+        case 'R':
+            x = (x == 3) ? 3 : x + 1;
+            break;
+        case '\n':
+            code = code * 10 + (x + 3 * y);
+            break;
+        }
+    }
 
-    printf("program ran trough, no problems\n");
+    // Finializing
+    fclose(pf);
+    printf("Answer part a: %" PRIu64 "\n", code);
+    goto clean_exit;
+
+error_while_open_file:
+    fclose(pf);
+    return 1;
+
+clean_exit:
+    // printf("program ran trough, no problems\n");
     return 0;
 }
 

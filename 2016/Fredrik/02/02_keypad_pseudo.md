@@ -2,7 +2,7 @@
 
 ## part a
 
-Lets go against best practices and instead make blazing fast program
+Lets go against best practices and instead make elegant blazing fast program
 
 ### keypad = x + 3y
 
