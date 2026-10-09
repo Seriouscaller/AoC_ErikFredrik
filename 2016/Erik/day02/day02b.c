@@ -3,11 +3,11 @@
 #include "input_output.h"
 #include <string.h>
 
-#define PRINT_DEBUG 1
+//#define PRINT_DEBUG 1
 
 #define ARR_SIZE 5000
-#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day02/day02_input_sample.txt"
-//#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day02/day02_input_full.txt"
+//#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day02/day02_input_sample.txt"
+#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day02/day02_input_full.txt"
 
 struct room {
     char room_name;
@@ -50,33 +50,21 @@ void move_crawler(char direction, struct crawler* cr, struct dungeon* d){
         case 'U':
             if(cr->location->exit_n){
                 cr->location = cr->location->exit_n;
-                printf("Moved to room: %c\n", cr->location->room_name);
-            }else{
-                printf("No exit north! Staying at room %c\n", cr->location->room_name);
             }
             break;
         case 'R':
             if(cr->location->exit_e){
                 cr->location = cr->location->exit_e;
-                printf("Moved to room: %c\n", cr->location->room_name);
-            }else{
-                printf("No exit east! Staying at room %c\n", cr->location->room_name);
             }
             break;
         case 'D':
             if(cr->location->exit_s){
                 cr->location = cr->location->exit_s;
-                printf("Moved to room: %c\n", cr->location->room_name);
-            }else{
-                printf("No exit south! Staying at room %c\n", cr->location->room_name);
             }
             break;
         case 'L':
             if(cr->location->exit_w){
                 cr->location = cr->location->exit_w;
-                printf("Moved to room: %c\n", cr->location->room_name);
-            }else{
-                printf("No exit west! Staying at room %c\n", cr->location->room_name);
             }
             break;
         default:
@@ -95,8 +83,8 @@ void connect_rooms(struct dungeon* d){
 
     // Room 3
     d->dungeon[3].exit_n = &d->dungeon[1];
-    d->dungeon[3].exit_e = &d->dungeon[3];
-    d->dungeon[3].exit_s = &d->dungeon[6];
+    d->dungeon[3].exit_e = &d->dungeon[4];
+    d->dungeon[3].exit_s = &d->dungeon[7];
     d->dungeon[3].exit_w = &d->dungeon[2];
 
     // Room 4
@@ -172,7 +160,9 @@ int main(){
     printf("Crawler start: %c\n", crawler.location->room_name);
 
     for(int i = 0; i < size; i++){
-        printf("i[%d] Character: %c ASCII: %d\n", i, input[i], (int)input[i]);
+        #ifdef PRINT_DEBUG 
+            printf("i[%d] Character: %c ASCII: %d\n", i, input[i], (int)input[i]);
+        #endif
 
         if(input[i] == '\n'){
             printf("End of row. Crawler at: %c\n\n", crawler.location->room_name);
