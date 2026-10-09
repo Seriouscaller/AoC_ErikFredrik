@@ -6,23 +6,21 @@
  */
 
 //// OPTIONS ////
-#define INPUTPATH "input/02_input_testcase.txt"
-// #define INPUTPATH "input/02_input.txt"
+// #define INPUTPATH "input/02_input_testcase.txt"
+#define INPUTPATH "input/02_input.txt"
 
 // comment/uncomment sets them
 // #define PRINT_INPUT_ANALYSIS
 
-//// imports ////
-#include <stdint.h>
-#include <stdlib.h>
-
 //// constants ////
 #define MAX_CODE_LENGTH 1000000 // Has to be less than UINT64MAX
+#define STARTING_POS '5'
 
 //// imports ////
 #include "../lib/frallfiles.h"
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 //// prototypes ////
 uint8_t rowcol_cunt(
@@ -34,6 +32,10 @@ uint8_t rowcol_cunt(
     const uint8_t print
 ); // imported
 uint8_t startup(const char *file_name, uint64_t *code_length);
+char move_L(char pos);
+char move_D(char pos);
+char move_U(char pos);
+char move_R(char pos);
 
 int main(void) {
 
@@ -48,7 +50,7 @@ int main(void) {
 
     // initialize
     uint64_t code_ind = 0;
-    char pos = '5';
+    char pos = STARTING_POS;
 
     FILE *pf;
     pf = fopen(INPUTPATH, "r");
@@ -62,29 +64,29 @@ int main(void) {
     while ((c = getc(pf)) != EOF) {
         // printf("%c", c);
         switch (c) {
-        default:
-            printf("unexpected character: %c, exiting program\n", c);
-            goto error_while_open_file;
         case 'L':
-            // x = (x == 1) ? 1 : x - 1;
+            pos = move_L(pos);
             break;
         case 'D':
-            // y = (y == 2) ? 2 : y + 1;
+            pos = move_D(pos);
             break;
         case 'U':
-            // y = (y == 0) ? 0 : y - 1;
+            pos = move_U(pos);
             break;
         case 'R':
-            // x = (x == 3) ? 3 : x + 1;
+            pos = move_R(pos);
             break;
         case '\n':
             code[code_ind++] = pos;
             break;
+        default:
+            printf("unexpected character: %c, exiting program\n", c);
+            goto error_while_open_file;
         }
     }
 
     // Finializing
-    fclose(pf);
+    if (pf != NULL) fclose(pf);
     code[code_ind++] = 0; // "Transform" code to a string
     printf("Answer part b: ");
     printf(code);
@@ -94,15 +96,18 @@ int main(void) {
 
 error_while_open_file:
     free(code);
+    code = NULL;
     if (pf != NULL) fclose(pf);
     return 1;
 
 error:
     free(code);
+    code = NULL;
     return 1;
 
 clean_exit:
     free(code);
+    code = NULL;
     printf("program ran trough, no problems\n");
     return 0;
 }
@@ -130,4 +135,89 @@ uint8_t startup(const char *inputpath, uint64_t *code_length) {
 
     *code_length = number_of_rows + 1; // + 1 to fit an ending 0 to be able to handle it as a string
     return 0;
+}
+
+char move_L(char pos) {
+    switch (pos) {
+    case '1':
+    case '2':
+    case '5':
+    case 'A':
+    case 'D':
+        // These are the left edges
+        return pos;
+    default:
+        return (pos - 1);
+    }
+}
+
+char move_D(char pos) {
+    switch (pos) {
+    case '5':
+    case 'A':
+    case 'D':
+    case 'C':
+    case '9':
+        // These are the down edges
+        return pos;
+    case '1':
+        return '3';
+    case '2':
+    case '3':
+    case '4':
+        return pos + 4;
+    case '6':
+    case '7':
+    case '8':
+        // I hope I read the ASCII right
+        // '6' = 54
+        // 'A' = 65
+        return pos + 11;
+    case 'B':
+        return 'D';
+    default:
+        printf("SISO\n");
+        return pos;
+    }
+}
+
+char move_U(char pos) {
+    switch (pos) {
+    case '5':
+    case '2':
+    case '1':
+    case '4':
+    case '9':
+        // These are the up edges
+        return pos;
+    case 'D':
+        return 'B';
+    case 'A':
+    case 'B':
+    case 'C':
+        return pos - 11;
+    case '6':
+    case '7':
+    case '8':
+        return pos - 4;
+    case '3':
+        return '1';
+    default:
+        printf("SISO\n");
+        return pos;
+    }
+}
+
+char move_R(char pos) {
+    switch (pos) {
+    case '1':
+    case '4':
+    case '9':
+    case 'C':
+    case 'D':
+        // These are the right edges
+        return pos;
+    default:
+        return (pos + 1);
+    }
 }
