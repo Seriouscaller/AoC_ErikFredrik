@@ -24,18 +24,37 @@
 #include <string.h>
 
 //// prototypes ////
-uint8_t rowcol_cunt(
-    const char *file_name,
-    uint64_t *number_of_rows,
-    uint64_t *number_of_cols,
-    int64_t *elem_max,
-    int64_t *elem_min,
-    const uint8_t print
-); // imported
+
+/**
+ * @brief Verifies input and finds out how long the answer code is
+ * @param file_name
+ * @param code_length adr outside return
+ * @return 0 success, 1 failure or weird input
+ */
 uint8_t startup(const char *file_name, uint64_t *code_length);
+/**
+ * @brief Moves robotarm over keypad
+ * @param pos position before movement, ex. '5'
+ * @return position after movement, ex 'A'
+ */
 char move_L(const char pos);
+/**
+ * @brief Moves robotarm over keypad
+ * @param pos position before movement, ex. '5'
+ * @return position after movement, ex 'A'
+ */
 char move_D(const char pos);
+/**
+ * @brief Moves robotarm over keypad
+ * @param pos position before movement, ex. '5'
+ * @return position after movement, ex 'A'
+ */
 char move_U(const char pos);
+/**
+ * @brief Moves robotarm over keypad
+ * @param pos position before movement, ex. '5'
+ * @return position after movement, ex 'A'
+ */
 char move_R(const char pos);
 
 int main(void) {
@@ -45,7 +64,7 @@ int main(void) {
     char *code = NULL;
     FILE *pf = NULL;
 
-    // malloc
+    // calloc
     uint64_t code_length = 0;
     if (startup(INPUTPATH, &code_length)) goto out;
     code = calloc(code_length + 1, sizeof(char)); // + 1 and calloc leaves trailing zero = string

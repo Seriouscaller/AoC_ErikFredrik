@@ -21,6 +21,12 @@
 #include <stdio.h>
 
 //// prototypes ////
+
+/**
+ * @brief Verifies that the output code fits inside a uint64_t
+ * @param inputpath
+ * @return 0 on it fits, 1 on error or doesnt fit.
+ */
 uint8_t verify_input(const char *inputpath);
 uint8_t rowcol_cunt(
     const char *file_name,
@@ -34,6 +40,9 @@ uint8_t n_digits_uint64_t(uint64_t number); // imported
 
 int main(void) {
 
+    FILE *pf = NULL;
+    uint8_t ret = 1;
+
     // verify input
 #ifdef VERIFY_INPUT
     if (verify_input(INPUTPATH)) return 1;
@@ -44,21 +53,20 @@ int main(void) {
     uint8_t y = 1;
     uint64_t code = 0;
 
-    FILE *pf;
     pf = fopen(INPUTPATH, "r");
     if (!pf) {
         printf("Something wrong with file-opening in main, mayby wrong file-name?");
-        return 1;
+        goto out;
     }
 
     // main loop
-    char c;
+    int c;
     while ((c = getc(pf)) != EOF) {
         // printf("%c", c);
         switch (c) {
         default:
             printf("unexpected character: %c, exiting program\n", c);
-            goto error_while_open_file;
+            goto out;
         case 'L':
             x = (x == 1) ? 1 : x - 1;
             break;
@@ -78,17 +86,14 @@ int main(void) {
     }
 
     // Finializing
-    fclose(pf);
-    printf("Answer part a: %" PRIu64 "\n", code);
-    goto clean_exit;
-
-error_while_open_file:
-    fclose(pf);
-    return 1;
-
-clean_exit:
     // printf("program ran trough, no problems\n");
-    return 0;
+    printf("Answer part a: %" PRIu64 "\n", code);
+    ret = 0;
+
+out:
+    fclose(pf);
+
+    return ret;
 }
 
 uint8_t verify_input(const char *inputpath) {

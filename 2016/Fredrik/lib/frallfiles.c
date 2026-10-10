@@ -1,7 +1,7 @@
 /**
  * @file /home/grisen/programming/c/frallfiles.c
  * @date 2026-09-28
- * @brief A library of useful fuctions
+ * @brief A library of useful fuctions, some are old and not great, but tested.
  */
 
 #include "frallfiles.h"
@@ -9,20 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/*!
- * @brief finds the length of lines in a txt-file. Will return length INCLUDING
- * newlines and EOF.
- *
- * @param[in] file_name  The filename as a string
- * @param[in] line_length  The address to a uint64_t variable to store the
- * line_length
- * @param[in] print 1 / 0 to print or not to print
- * @param[in] homogenous The address to a uint8_t variable to store if
- * line-lengths are homogenous or not
- *
- * @return a uint8_t.  1 is unsuccesful operation , 0 succesful
- * Last updated feb 2026
- */
 uint8_t line_length_finder(const char *file_name, uint64_t *line_length, const uint8_t print, uint8_t *homogenous) {
     FILE *pf;
     pf = fopen(file_name, "r");
@@ -224,16 +210,6 @@ uint8_t rowcol_cunt(
     }
 }
 
-/*!
- * @brief A function for finding the number of digits in a number in base10. for
- * example 12345 has 5 digits.
- *
- * @param[in] number The number in question
- *
- * @return the number of digits
- *
- * Last updated feb 2026
- */
 uint8_t n_digits_uint16_t(uint16_t number) {
     if (number == 0)
         return 1;
@@ -245,16 +221,6 @@ uint8_t n_digits_uint16_t(uint16_t number) {
     return n;
 }
 
-/*!
- * @brief A function for finding the number of digits in a number in base10. for
- * example 12345 has 5 digits.
- *
- * @param[in] number The number in question
- *
- * @return the number of digits
- *
- * Last updated oct 2026
- */
 uint8_t n_digits_uint64_t(uint64_t number) {
     if (number == 0)
         return 1;
