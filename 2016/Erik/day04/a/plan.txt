@@ -1,0 +1,8 @@
+Split puzzle into lines
+determine length from start to beginning of brackets
+count letter occurance
+sort in list of most occuring
+create string of most 5 most occuring letters
+
+Sector ID is always left of [
+encrypted name is always split by '-'s
