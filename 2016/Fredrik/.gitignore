@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# Whitelist
+!*/
+!*.c
+!*.h
+!.gitignore
+!*.txt
+!*pseudo.md
