@@ -1,0 +1,19 @@
+Split puzzle into lines
+determine length from start to beginning of brackets
+count letter occurance
+sort in list of most occuring
+create string of most 5 most occuring letters
+
+Sector ID is always left of [
+encrypted name is always split by '-'s
+
+1. Extract lines
+2. Find location of square brackets
+3. Extract Checksum
+4. Extract Sector-ID
+5. Loop over remaining letters
+6. Cross ref each letter with index in alphabet
+7. Count each letter, add to letter array
+8. Find 5 most freq letters
+9. Compare with checksum
+10. Count all real rooms

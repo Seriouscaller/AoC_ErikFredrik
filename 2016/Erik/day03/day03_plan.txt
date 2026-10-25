@@ -1,0 +1,7 @@
+Input is split into 3x3 int arrays
+
+Check first triangle column
+Check second triangle column
+Check third triangle column
+
+iterate loop to access next 3x3 array
