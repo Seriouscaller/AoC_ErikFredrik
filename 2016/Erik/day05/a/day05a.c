@@ -20,6 +20,7 @@ enum RETURNCODE {
 };
 
 void unsigned_number_to_string(uint64_t number, char* string);
+bool is_pattern_found(uint8_t* string);
 
 void unsigned_number_to_string(uint64_t number, char* string){
 
@@ -48,7 +49,18 @@ void print_hash(uint8_t *p){
     printf("\n");
 }
 
+bool is_pattern_found(uint8_t* string){
+    int index = 0;
+    while(string[index] == '\0'){
+        index++;
+    }
 
+    if(5 <= index){
+        return true;
+    }else{
+        return false;
+    }
+}
 
 int main(int argc, char *argv[]){
 
@@ -57,7 +69,7 @@ int main(int argc, char *argv[]){
     //uint64_t counter = 0;
     uint64_t counter = 3231929;
 
-    uint8_t remaining_password_characters = 0;
+    uint8_t remaining_password_characters = 8;
     //char puzzle_input[50] = "uqwqemis";
     char puzzle_input[50] = "abc";
     while(remaining_password_characters <= 8){
@@ -67,22 +79,33 @@ int main(int argc, char *argv[]){
         unsigned_number_to_string(counter, counter_string);
 
         strcat(input, counter_string);
-        printf("Input: %s Counter: %s Cat: %s\n", puzzle_input, counter_string, input);
-        uint8_t result[17];
-        md5String(input, result);
+        //printf("Input: %s Counter: %s Cat: %s\n", puzzle_input, counter_string, input);
+        uint8_t result[16];
+        uint8_t bitpattern[5];
+        
+        md5String("abc5017308", result);
+        //md5String(input, result);
+        
+        bitpattern[0] = result[0];
+        bitpattern[1] = result[1];
+        bitpattern[2] = result[2] & 0b11110000;
+        
+        printf("%d\n", bitpattern[2]);
 
-        char test_string[16] = {'/0'};
-        result[16] = '/0';
-        strcpy(test_string, result);
-        test_string[5] = '\0';
-        int res = strcmp(test_string, search_pattern);
-        if(res == 0){
-            printf("Found Hash! %s", result);
+        if(is_pattern_found(result)){
+            printf("Hash: %s\n", result);
+            printf("Pass char: %c\n", result[6]);
+            remaining_password_characters--;
         }
+
         print_hash(result);
         
-        //counter++;
+        counter++;
     }
 
     return 0;
 }
+
+/*
+00 00 08 f8 2c 5b 39 24 a1 ec be bf 60 34 4e 00
+*/
