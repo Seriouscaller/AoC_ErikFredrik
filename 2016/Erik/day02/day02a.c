@@ -42,6 +42,10 @@ int main(){
     char input[ARR_SIZE];
 
     int ret = read_file(INPUT_FILE_NAME, input);
+    char file_name[] = "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day02_input_full.txt";
+    char input[ARR_SIZE];
+
+    int ret = read_file(file_name, input);
     if(ret == 1 ){
         printf("Unable to open file!\n");
         abort();

@@ -1,0 +1,33 @@
+Day 1a
+
+The Document indicates that you should start at the given coordinates (where you just landed) and face North. Then, follow the provided sequence: either turn left (L) or right (R) 90 degrees, then walk forward the given number of blocks, ending at a new intersection.
+
+There's no time to follow such ridiculous instructions on foot, though, so you take a moment and work out the destination. Given that you can only walk on the street grid of the city, how far is the shortest path to the destination?
+
+For example:
+- Following R2, L3 leaves you 2 blocks East and 3 blocks North, or 5 blocks away.
+- R2, R2, R2 leaves you 2 blocks due South of your starting position, which is 2 blocks away.
+- R5, L5, R5, R3 leaves you 12 blocks away.
+How many blocks away is Easter Bunny HQ?
+
+Open file
+Save content in array
+
+Direction = 0
+x = 0
+y = 0
+loop over array
+    Extract Letter
+    IF 'R'
+        Direction = (Direction + 90) % 360
+    IF 'L'
+        Direction = (Direction - 90) % 360
+
+    Extract Number
+    SWITCH Direction
+        0 -> y + Number
+        90 -> x + Number
+        180 -> y - Number
+        270 -> x - Number
+Calculate distance from 0,0 to new location (sum of absolute values of 
+differences in both coordinates)
