@@ -38,6 +38,18 @@ uint8_t main_execution(
     uint64_t line_length_max
 );
 
+uint8_t seperate_line(
+    FILE *pf,
+    char *line_input,
+    char *character_part_input,
+    uint64_t nmb_of_lines,
+    uint64_t line_length_max,
+    enum search_part part_of_search,
+    char *checksum_input,
+    uint64_t *number
+
+);
+
 int main(void) {
 
     // initializing
@@ -123,76 +135,102 @@ uint8_t main_execution(
     // trying to store all the lines as their own parts
     char checksum_input[6] = {0};
     char checksum_calc[6] = {0};
+    enum search_part part_of_search = PART_NAME;
+
+    // Seperate all lines, and handle them seperately
+    uint64_t integer = 0;
+    for (uint64_t line_ind = 0; line_ind < nmb_of_lines; line_ind++) {
+        seperate_line(
+            pf,
+            line_input,
+            character_part_input,
+            nmb_of_lines,
+            line_length_max,
+            part_of_search,
+            checksum_input,
+            &integer
+        );
+        // printf("character_part_input: %s\n", character_part_input);
+        // printf("checksum_input: %s\n", checksum_input);
+    }
+    fclose(pf); // it's ok to double close since we set NULL
+    pf = NULL;
+
+    return 0;
+}
+uint8_t seperate_line(
+    FILE *pf,
+    char *line_input,
+    char *character_part_input,
+    uint64_t nmb_of_lines,
+    uint64_t line_length_max,
+    enum search_part part_of_search,
+    char *checksum_input,
+    uint64_t *number
+
+) {
+
+    // resetting all parts to 0
+    part_of_search = PART_NAME;
+    memset(line_input, 0, line_length_max * sizeof(char));
+    memset(character_part_input, 0, line_length_max * sizeof(char));
+    memset(checksum_input, 0, 6 * sizeof(char));
     uint8_t char_input_ind = 0;
     uint8_t char_output_ind = 0;
     char c = 0;
-    enum search_part part_of_search = PART_NAME;
 
-    for (uint64_t line_ind = 0; line_ind < nmb_of_lines; line_ind++) {
-
-        // resetting all parts to 0
-        part_of_search = PART_NAME;
-        memset(line_input, 0, line_length_max * sizeof(char));
-        memset(character_part_input, 0, line_length_max * sizeof(char));
-        memset(checksum_input, 0, 6 * sizeof(char));
-        memset(checksum_calc, 0, 6 * sizeof(char));
-        char_input_ind = 0;
-        char_output_ind = 0;
-        c = 0;
-
-        // getting the full line
-        fgets(line_input, line_length_max, pf);
+    // getting the full line
+    fgets(line_input, line_length_max, pf);
 #ifdef PRINT_PARTS
-        printf("%s", line_input);
+    printf("%s", line_input);
 #endif
 
-        // 0 is character part, 1 is integer part, 2 is checksumpart
+    // 0 is character part, 1 is integer part, 2 is checksumpart
 
-        uint64_t number = 0;
-        while ((c = line_input[char_input_ind++]) != 0) {
-            switch (part_of_search) {
-            case (PART_NAME):
-                if (c != '-') {
-                    if ((c < '0') || (c > '9')) {
-                        character_part_input[char_output_ind++] = c;
-                        // printf("%c", c);
-                    } else {
-                        part_of_search = PART_SECTOR;
-                        number = c - 48; // ascii conversion hopefully
-                    }
-                }
-                break;
-            case (PART_SECTOR):
-                if (c != '[') {
-                    number = number * 10 + c - 48; // ascii conversion hopefully
+    while ((c = line_input[char_input_ind++]) != 0) {
+        switch (part_of_search) {
+        case (PART_NAME):
+            if (c != '-') {
+                if ((c < '0') || (c > '9')) {
+                    character_part_input[char_output_ind++] = c;
+                    // printf("%c", c);
                 } else {
-                    part_of_search = PART_CHECKSUM;
-                    char_output_ind = 0;
+                    part_of_search = PART_SECTOR;
+                    *number = c - 48; // ascii conversion hopefully
                 }
-                break;
-            case (PART_CHECKSUM):
-                if (c != ']') {
-                    checksum_input[char_output_ind++] = c;
-                } else {
-                    part_of_search = PART_DONE;
-                }
-                break;
-            case (PART_DONE):
-                break;
             }
+            break;
+        case (PART_SECTOR):
+            if (c != '[') {
+                *number = *number * 10 + c - 48; // ascii conversion hopefully
+            } else {
+                part_of_search = PART_CHECKSUM;
+                char_output_ind = 0;
+            }
+            break;
+        case (PART_CHECKSUM):
+            if (c != ']') {
+                checksum_input[char_output_ind++] = c;
+            } else {
+                part_of_search = PART_DONE;
+            }
+            break;
+        case (PART_DONE):
+            break;
         }
-#ifdef PRINT_PARTS
-        printf("\n");
-        // trying to print the character part as a string
-        printf("character_part_input: %s\n", character_part_input);
-
-        // trying to print the number part as a number
-        printf("number: %" PRIu64 "\n", number);
-
-        // trying to print the checksum
-        printf("checksum_input: %s\n", checksum_input);
-        printf("\n");
-#endif
     }
+#ifdef PRINT_PARTS
+    printf("\n");
+    // trying to print the character part as a string
+    printf("character_part_input: %s\n", character_part_input);
+
+    // trying to print the number part as a number
+    printf("number: %" PRIu64 "\n", *number);
+
+    // trying to print the checksum
+    printf("checksum_input: %s\n", checksum_input);
+    printf("\n");
+#endif
+
     return 0;
 }
