@@ -22,6 +22,13 @@
 
 //// prototypes ////
 
+enum search_part {
+    PART_NAME,     // Character part
+    PART_SECTOR,   // Integer part
+    PART_CHECKSUM, // Checksum part
+    PART_DONE      // after ]
+};
+
 uint8_t startup(const char *file_name, uint64_t *line_length_max, uint64_t *nmb_of_lines);
 uint8_t main_execution(
     FILE *pf,
@@ -113,17 +120,18 @@ uint8_t main_execution(
     uint64_t nmb_of_lines,
     uint64_t line_length_max
 ) {
-    printf("main is executing\n");
-    // trying to print all the lines as their own parts
+    // trying to store all the lines as their own parts
     char checksum_input[6] = {0};
     char checksum_calc[6] = {0};
     uint8_t char_input_ind = 0;
     uint8_t char_output_ind = 0;
     char c = 0;
+    enum search_part part_of_search = PART_NAME;
 
     for (uint64_t line_ind = 0; line_ind < nmb_of_lines; line_ind++) {
 
         // resetting all parts to 0
+        part_of_search = PART_NAME;
         memset(line_input, 0, line_length_max * sizeof(char));
         memset(character_part_input, 0, line_length_max * sizeof(char));
         memset(checksum_input, 0, 6 * sizeof(char));
@@ -134,39 +142,42 @@ uint8_t main_execution(
 
         // getting the full line
         fgets(line_input, line_length_max, pf);
-        // printf("%s", line_input);
+#ifdef PRINT_PARTS
+        printf("%s", line_input);
+#endif
 
-        // trying to seperate its parts
         // 0 is character part, 1 is integer part, 2 is checksumpart
-        uint8_t part_of_search = 0;
+
         uint64_t number = 0;
         while ((c = line_input[char_input_ind++]) != 0) {
             switch (part_of_search) {
-            case (0):
+            case (PART_NAME):
                 if (c != '-') {
                     if ((c < '0') || (c > '9')) {
                         character_part_input[char_output_ind++] = c;
                         // printf("%c", c);
                     } else {
-                        part_of_search = 1;
+                        part_of_search = PART_SECTOR;
                         number = c - 48; // ascii conversion hopefully
                     }
                 }
                 break;
-            case (1):
+            case (PART_SECTOR):
                 if (c != '[') {
                     number = number * 10 + c - 48; // ascii conversion hopefully
                 } else {
-                    part_of_search = 2;
+                    part_of_search = PART_CHECKSUM;
                     char_output_ind = 0;
                 }
                 break;
-            case (2):
+            case (PART_CHECKSUM):
                 if (c != ']') {
                     checksum_input[char_output_ind++] = c;
                 } else {
-                    part_of_search = 3;
+                    part_of_search = PART_DONE;
                 }
+                break;
+            case (PART_DONE):
                 break;
             }
         }
