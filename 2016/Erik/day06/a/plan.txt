@@ -1,0 +1,6 @@
+DAY 06a
+
+ - Create array width x height of input
+ - Iterate over each column
+ - count occurances of each character
+ - select character with highest count in each column
