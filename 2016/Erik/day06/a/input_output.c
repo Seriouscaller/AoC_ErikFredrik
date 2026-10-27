@@ -1,32 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-/*
-It counts the number of characters in the text-file.
-Each newline in text adds two characters (newline and carriagereturn)
-to the total.
+struct file_information {
+    long file_size;
+    long rows;
+    long columns;
+};
 
-Example:
-123
-456
-Returns: 8
-
-*/
-long get_file_size(char* file_name){
+struct file_information get_file_information(char* file_name){
     FILE *fp = fopen(file_name, "r");
-    
+    struct file_information file_info = {.file_size = 0, .rows = 0, .columns = 0};
+
     if(fp == NULL) {
         printf("Failed to open file!\n");
-        return -1;
+        return file_info;
     }
-    int ret = fseek(fp, 0 , SEEK_END);
-    if(ret){
-        printf("fseek failed!\n");
-        abort();
+
+    int columns = 0; int ch;
+    while ((ch = fgetc(fp)) != EOF){
+        columns++;
+        if(ch == '\n'){
+            file_info.rows++;
+            file_info.columns = columns - 1;
+            columns = 0;
+        }
     }
-    long size = ftell(fp);
+
+    file_info.file_size = ftell(fp);
     fclose(fp);
-    return size;
+    return file_info;
 }
 
 void* allocate(size_t size_of_text_file){
