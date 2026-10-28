@@ -1,11 +1,12 @@
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 struct file_information {
     long file_size;
     long rows;
-    long columns;
+    uint16_t columns;
 };
 
 struct file_information get_file_information(char* file_name);

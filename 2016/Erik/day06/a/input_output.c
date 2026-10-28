@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 struct file_information {
     long file_size;
     long rows;
-    long columns;
+    uint16_t columns;
 };
 
 struct file_information get_file_information(char* file_name){
@@ -20,11 +21,16 @@ struct file_information get_file_information(char* file_name){
     int columns = 0; int ch;
     while ((ch = fgetc(fp)) != EOF){
         columns++;
-        if(ch == '\n'){
-            file_info.rows++;
-            file_info.columns = columns - 1;
-            columns = 0;
+        if(ch != '\n'){
+            continue;
         }
+        
+        file_info.rows++;
+        if((columns - 1) > file_info.columns){
+            file_info.columns = columns - 1;
+        }
+        columns = 0;
+        
     }
 
     file_info.file_size = ftell(fp);
