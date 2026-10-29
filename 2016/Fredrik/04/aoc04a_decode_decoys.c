@@ -10,7 +10,7 @@
 
 // comment/uncomment sets them
 // #define PRINT_INPUT_ANALYSIS
-#define PRINT_PARTS
+// #define PRINT_PARTS
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -49,6 +49,8 @@ uint8_t seperate_line(
     uint64_t *number
 
 );
+
+uint8_t calculate_checksum(char *checksum_calc, char *character_part_input);
 
 int main(void) {
 
@@ -150,11 +152,14 @@ uint8_t main_execution(
             checksum_input,
             &integer
         );
+        calculate_checksum(checksum_calc, character_part_input);
+        // if (checksums_are_equal(checksum_calc, checksum_input)) finalanswer += integer;
+
         // printf("character_part_input: %s\n", character_part_input);
         // printf("checksum_input: %s\n", checksum_input);
     }
-    fclose(pf); // it's ok to double close since we set NULL
-    pf = NULL;
+    // fclose(pf); // it's ok to double close since we set NULL
+    // pf = NULL;
 
     return 0;
 }
@@ -167,7 +172,6 @@ uint8_t seperate_line(
     enum search_part part_of_search,
     char *checksum_input,
     uint64_t *number
-
 ) {
 
     // resetting all parts to 0
@@ -184,8 +188,6 @@ uint8_t seperate_line(
 #ifdef PRINT_PARTS
     printf("%s", line_input);
 #endif
-
-    // 0 is character part, 1 is integer part, 2 is checksumpart
 
     while ((c = line_input[char_input_ind++]) != 0) {
         switch (part_of_search) {
@@ -232,5 +234,39 @@ uint8_t seperate_line(
     printf("\n");
 #endif
 
+    return 0;
+}
+
+uint8_t calculate_checksum(char *checksum_calc, char *character_part_input) {
+
+    // First we just map all the characters used, and how many times they occur
+    memset(checksum_calc, 0, 6 * sizeof(char)); // checksum_calc = {0};
+    char c = 0;
+    char checksum_calc_big[30] = {0};
+    uint8_t char_occurences[30] = {0};
+    printf("%s\n", character_part_input);
+    uint8_t i_in = 0;
+    uint8_t i_big_setter = 0;
+    uint8_t already_there = 0;
+    while (character_part_input[i_in] != 0) {
+        already_there = 0;
+        c = character_part_input[i_in];
+        // printf("%c\n", character_part_input[i_in]);
+        for (uint8_t i_char_out = 0; i_char_out < 30; i_char_out++) {
+            if (checksum_calc_big[i_char_out] == c) {
+                char_occurences[i_char_out] += 1;
+                already_there = 1;
+            }
+        }
+        if (!already_there) {
+            checksum_calc_big[i_big_setter++] = c;
+        }
+        i_in++;
+    }
+
+    printf("%s\n", checksum_calc_big);
+    printf("%s\n", char_occurences);
+
+    // Then we sort
     return 0;
 }
