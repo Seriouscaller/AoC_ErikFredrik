@@ -234,9 +234,6 @@ uint8_t main_execution(
         );
         calculate_checksum(checksum_calc, character_part_input);
         if (checksums_are_equal(checksum_calc, checksum_input)) *finalanswer += integer;
-
-        // printf("character_part_input: %s\n", character_part_input);
-        // printf("checksum_input: %s\n", checksum_input);
     }
     // fclose(pf); // it's ok to double close since we set NULL
     // pf = NULL;

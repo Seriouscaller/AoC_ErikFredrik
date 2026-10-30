@@ -161,3 +161,41 @@ uint8_t calculate_checksum(char *checksum_calc, char *character_part_input) {
 ### implementation of new design
 
 So some typos but it actually worked with the indexes above
+
+## part b
+
+### idea
+
+It looks pretty easy, we can go from this line
+
+```c
+        if (checksums_are_equal(checksum_calc, checksum_input)) *finalanswer += integer; // Line 236 in original
+    }
+```
+
+to just continue part b
+
+```c
+        if (checksums_are_equal(checksum_calc, checksum_input)){ 
+            *finalanswer_a += integer;
+            decode(character_part_input, integer);
+        }
+    }
+```
+
+The decode function will be straightforward
+- save an output string
+- go through each character in input until we hit 0
+    - if its a '-' => store as ' '
+    - else apply store ceasar(char, integer)
+- caesar will look like this
+    - adding the integer
+    - while(newChar isnt between ascii letters)
+        - newChar -= ascii_alphabet_length
+
+I dont know where the actual answer is, quite unclear in instructions, mayby I will have to just look at the output?
+
+### Answer
+
+in the end i just looked at outputs starting with n, and found it. Could have minmaxed it more, but this is good enough for me
+
