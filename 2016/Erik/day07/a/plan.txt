@@ -1,0 +1,10 @@
+DAY 07a
+
+ - Handle one line of input at a time
+ - locate square bracets
+ - Check if ABBA exist in brackets (within hypernet sequence)
+    - IF Skip to next puzzle-line 
+ - ELSE
+ - Remove squarebrackets and inside-contents from string
+ - Look for two letters next to eachother, that are also atleast 1 space from the start or end of the string-snippet, 
+ and different than the middle two letters 
