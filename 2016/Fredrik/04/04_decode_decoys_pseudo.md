@@ -145,8 +145,8 @@ uint8_t calculate_checksum(char *checksum_calc, char *character_part_input) {
             checksum_calc_big[index_of_char(c)].occurence += 1;
         }
         else{
-            checksum_calc_big[i_big_setter++].c = c;
-            checksum_calc_big[i_big_setter].occurence = 1;
+            checksum_calc_big[i_big_setter].c = c;
+            checksum_calc_big[i_big_setter++].occurence = 1;
         }
         i_in++;
     }
@@ -158,5 +158,6 @@ uint8_t calculate_checksum(char *checksum_calc, char *character_part_input) {
 }
 ```
 
-```
+### implementation of new design
 
+So some typos but it actually worked with the indexes above

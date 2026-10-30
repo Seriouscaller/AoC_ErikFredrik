@@ -5,12 +5,17 @@
  */
 
 //// options ////
-#define INPUTPATH "input/04_input_testcase.txt"
-// #define INPUTPATH "input/04_input.txt"
+// #define INPUTPATH "input/04_input_testcase.txt"
+#define INPUTPATH "input/04_input.txt"
+
+#define ALPHABET_LENGTH 30
 
 // comment/uncomment sets them
 // #define PRINT_INPUT_ANALYSIS
 // #define PRINT_PARTS
+// #define PRINT_CSUM_UNSORTED
+// #define PRINT_CSUM_SORTED
+// #define PRINT_CSUM_CALC
 
 //// imports ////
 #include "../lib/frallfiles.h"
@@ -20,37 +25,111 @@
 #include <stdlib.h>
 #include <string.h>
 
+//// structs ////
+
+typedef struct {
+    char c;
+    uint8_t occurence;
+} CharOccur;
+
 //// prototypes ////
 
-enum search_part {
-    PART_NAME,     // Character part
-    PART_SECTOR,   // Integer part
-    PART_CHECKSUM, // Checksum part
-    PART_DONE      // after ]
-};
-
+/**
+ * @brief Starting up program, verifiying input, and finding how many inputs and max length of lines
+ * @param file_name
+ * @param line_length_max
+ * @param nmb_of_lines
+ * @return errorcode
+ */
 uint8_t startup(const char *file_name, uint64_t *line_length_max, uint64_t *nmb_of_lines);
+
+/**
+ * @brief The real execution of program
+ * @param pf
+ * @param line_input
+ * @param character_part_input
+ * @param nmb_of_lines
+ * @param line_length_max
+ * @param finalanswer
+ * @return error code
+ */
 uint8_t main_execution(
     FILE *pf,
     char *line_input,
     char *character_part_input,
     uint64_t nmb_of_lines,
-    uint64_t line_length_max
+    uint64_t line_length_max,
+    uint64_t *finalanswer
 );
 
+/**
+ * @brief seperates the lines of input into strings and an integer for the number part
+ * @param pf
+ * @param line_input
+ * @param character_part_input
+ * @param line_length_max
+ * @param checksum_input
+ * @param number
+ * @return errorcode
+ */
 uint8_t seperate_line(
     FILE *pf,
     char *line_input,
     char *character_part_input,
-    uint64_t nmb_of_lines,
     uint64_t line_length_max,
-    enum search_part part_of_search,
     char *checksum_input,
     uint64_t *number
 
 );
 
+/**
+ * @brief calculates the checksum from the given input
+ * @param checksum_calc
+ * @param character_part_input
+ * @return errorcode
+ */
 uint8_t calculate_checksum(char *checksum_calc, char *character_part_input);
+
+/**
+ * @brief Sorting function for qsort
+ * @param pa pointer to CharOccur 1
+ * @param pb pointer to CharOccur 2
+ * @return
+ */
+int character_sort(const void *pa, const void *pb);
+
+/**
+ * @brief Finds if the character is stored in the array of CharOccur
+ * @param charTested
+ * @param length_of_array_nmb number of CharOccur in the array
+ * @param charOccurArray
+ * @return 1 / 0 true / false
+ */
+uint8_t is_in_array(char charTested, uint8_t length_of_array_nmb, CharOccur *charOccurArray);
+
+/**
+ * @brief Finds the index of a given character in an array of CharOccur, needs it to be in there, otherwise returns 0
+ * @param charTested
+ * @param length_of_array_nmb
+ * @param charOccurArray
+ * @return index if its in there, otherwise 0
+ */
+uint8_t index_of_char(char charTested, uint8_t length_of_array_nmb, CharOccur *charOccurArray);
+
+/**
+ * @brief Prints the array of CharOccur to stdout
+ * @param length_of_array_nmb
+ * @param charOccurArray
+ */
+void print_occur(uint8_t length_of_array_nmb, CharOccur *charOccurArray);
+
+/**
+ * @brief Checks if two strings of length 5 are the same
+ * @param checksum_calc
+ * @param checksum_input
+ * @return 1 if they are the same, 0 otherwise
+ */
+uint8_t checksums_are_equal(char *checksum_calc, char *checksum_input);
 
 int main(void) {
 
@@ -62,6 +141,7 @@ int main(void) {
 
     uint64_t line_length_max = 0;
     uint64_t nmb_of_lines = 0;
+    uint64_t finalanswer = 0;
 
     // Finding max linelength and number of lines
     if (startup(INPUTPATH, &line_length_max, &nmb_of_lines)) goto out;
@@ -86,10 +166,11 @@ int main(void) {
     }
 
     // Main program
-    if (main_execution(pf, line_input, character_part_input, nmb_of_lines, line_length_max)) goto out;
+    if (main_execution(pf, line_input, character_part_input, nmb_of_lines, line_length_max, &finalanswer)) goto out;
 
     // Exiting
-    printf("\nprgrm ran thru, no prob\n");
+    // printf("\nprgrm ran thru, no prob\n");
+    printf("Final answer part a: %" PRIu64 " \n", finalanswer);
     ret = 0;
 
 out:
@@ -132,12 +213,13 @@ uint8_t main_execution(
     char *line_input,
     char *character_part_input,
     uint64_t nmb_of_lines,
-    uint64_t line_length_max
+    uint64_t line_length_max,
+    uint64_t *finalanswer
 ) {
+
     // trying to store all the lines as their own parts
     char checksum_input[6] = {0};
     char checksum_calc[6] = {0};
-    enum search_part part_of_search = PART_NAME;
 
     // Seperate all lines, and handle them seperately
     uint64_t integer = 0;
@@ -146,14 +228,12 @@ uint8_t main_execution(
             pf,
             line_input,
             character_part_input,
-            nmb_of_lines,
             line_length_max,
-            part_of_search,
             checksum_input,
             &integer
         );
         calculate_checksum(checksum_calc, character_part_input);
-        // if (checksums_are_equal(checksum_calc, checksum_input)) finalanswer += integer;
+        if (checksums_are_equal(checksum_calc, checksum_input)) *finalanswer += integer;
 
         // printf("character_part_input: %s\n", character_part_input);
         // printf("checksum_input: %s\n", checksum_input);
@@ -167,15 +247,12 @@ uint8_t seperate_line(
     FILE *pf,
     char *line_input,
     char *character_part_input,
-    uint64_t nmb_of_lines,
     uint64_t line_length_max,
-    enum search_part part_of_search,
     char *checksum_input,
     uint64_t *number
 ) {
 
     // resetting all parts to 0
-    part_of_search = PART_NAME;
     memset(line_input, 0, line_length_max * sizeof(char));
     memset(character_part_input, 0, line_length_max * sizeof(char));
     memset(checksum_input, 0, 6 * sizeof(char));
@@ -188,6 +265,13 @@ uint8_t seperate_line(
 #ifdef PRINT_PARTS
     printf("%s", line_input);
 #endif
+    enum search_part {
+        PART_NAME,     // Character part
+        PART_SECTOR,   // Integer part
+        PART_CHECKSUM, // Checksum part
+        PART_DONE      // after ]
+    };
+    enum search_part part_of_search = PART_NAME;
 
     while ((c = line_input[char_input_ind++]) != 0) {
         switch (part_of_search) {
@@ -242,31 +326,90 @@ uint8_t calculate_checksum(char *checksum_calc, char *character_part_input) {
     // First we just map all the characters used, and how many times they occur
     memset(checksum_calc, 0, 6 * sizeof(char)); // checksum_calc = {0};
     char c = 0;
-    char checksum_calc_big[30] = {0};
-    uint8_t char_occurences[30] = {0};
-    printf("%s\n", character_part_input);
-    uint8_t i_in = 0;
-    uint8_t i_big_setter = 0;
-    uint8_t already_there = 0;
+    CharOccur checksum_calc_big[ALPHABET_LENGTH] = {0}; // Array of characters found
+
+    uint8_t i_in = 0;         // index of read characters from input
+    uint8_t i_big_setter = 0; // nmb of stored CharOccur
     while (character_part_input[i_in] != 0) {
-        already_there = 0;
         c = character_part_input[i_in];
-        // printf("%c\n", character_part_input[i_in]);
-        for (uint8_t i_char_out = 0; i_char_out < 30; i_char_out++) {
-            if (checksum_calc_big[i_char_out] == c) {
-                char_occurences[i_char_out] += 1;
-                already_there = 1;
-            }
-        }
-        if (!already_there) {
-            checksum_calc_big[i_big_setter++] = c;
+        if (is_in_array(c, i_big_setter + 1, checksum_calc_big)) {
+            checksum_calc_big[index_of_char(c, i_big_setter, checksum_calc_big)].occurence += 1;
+        } else {
+            checksum_calc_big[i_big_setter].c = c;
+            checksum_calc_big[i_big_setter++].occurence = 1;
         }
         i_in++;
     }
 
-    printf("%s\n", checksum_calc_big);
-    printf("%s\n", char_occurences);
+#ifdef PRINT_CSUM_UNSORTED
+    printf("Printing them unsorted: \n");
+    print_occur(i_big_setter, checksum_calc_big);
+#endif
 
     // Then we sort
+    qsort(checksum_calc_big, i_big_setter, sizeof(CharOccur), character_sort);
+
+#ifdef PRINT_CSUM_SORTED
+    printf("Printing them sorted: \n");
+    print_occur(i_big_setter, checksum_calc_big);
+#endif
+
+    // Then we return the calculated checksum
+    for (uint8_t i = 0; i < 5; i++) { // 5 for checksum length
+        checksum_calc[i] = checksum_calc_big[i].c;
+    }
+
     return 0;
+}
+
+int character_sort(const void *pa, const void *pb) {
+
+    const CharOccur *a = pa;
+    const CharOccur *b = pb;
+
+    if (a->occurence > b->occurence) return -1;
+    if (b->occurence > a->occurence) return 1;
+    if (a->c > b->c)
+        return 1; // this might be other way round
+    else if (a->c < b->c) {
+        return -1;
+    } else {
+        return 0;
+    }
+} // for getting the syntax working i needed ai...
+
+uint8_t is_in_array(char charTested, uint8_t length_of_array_nmb, CharOccur *charOccurArray) {
+    // no testing for out of bounds, happycoding
+    for (uint8_t i = 0; i < length_of_array_nmb; i++) {
+        if (charTested == charOccurArray[i].c) return 1;
+    }
+    return 0;
+} // would have been better to just return the index straight away, not changing, happycoding
+
+uint8_t index_of_char(char charTested, uint8_t length_of_array_nmb, CharOccur *charOccurArray) {
+    for (uint8_t i = 0; i < length_of_array_nmb; i++) {
+        if (charTested == charOccurArray[i].c) {
+            return i;
+        }
+    }
+    printf("index was not found, should be impossible, no errorhandling for this fcn though\n"); // happy-coding
+    return 0;
+}
+
+void print_occur(uint8_t length_of_array_nmb, CharOccur *charOccurArray) {
+    for (uint8_t i = 0; i < length_of_array_nmb; i++) {
+        printf("character: %c | %" PRIu8 "\n", charOccurArray[i].c, charOccurArray[i].occurence);
+    }
+}
+
+uint8_t checksums_are_equal(char *checksum_calc, char *checksum_input) {
+#ifdef PRINT_CSUM_CALC
+    printf("%s\n", checksum_calc);
+#endif
+    for (uint8_t i = 0; i < 5; i++) { // 5 for checksumlength
+        if (checksum_calc[i] != checksum_input[i]) {
+            return 0;
+        }
+    }
+    return 1;
 }
