@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 struct file_information {
-    long file_size;
-    long rows;
+    uint64_t file_size;
+    uint64_t rows;
     uint16_t max_columns;
 };
 
@@ -54,6 +55,7 @@ void* allocate(size_t size_of_text_file){
 void free_allocation(void* ptr){
     if(ptr){
         free(ptr);
+        ptr = NULL;
     }
 }
 
@@ -73,3 +75,20 @@ int read_file(char* file_name, char* array){
 
     return 0;
 }
+
+int8_t split_puzzle_into_rows(uint16_t rows, uint16_t columns, char lines[rows][columns], char* puzzle_string, struct file_information* file_info){
+    uint64_t i = 0, start = 0, end = 0, index_row = 0;
+    while(i < file_info->file_size){
+        if(puzzle_string[i] == '\n'){
+            end = i;
+            uint64_t length_of_string_to_copy = end - start;
+            if(length_of_string_to_copy <= columns && 0 < length_of_string_to_copy){
+                strncpy(lines[index_row++], &puzzle_string[start], length_of_string_to_copy);
+            }else{
+                printf("Unable to copy line! Too long?\n");
+            }
+            start = end + 1;
+        }
+        i++;
+    }
+};
