@@ -1,0 +1,28 @@
+    /****** ERIKS PLAN ********
+     * Define X and Y display resolution
+     * 
+    - Parse one line at a time
+    - LINE
+        - Separate content of line using WHITESPACE delimiter
+        - Create a struct: 
+            (rotate column x=1 by 2)
+            Struct instruction {
+                char operation;     // Enum: RECT, ROTATE
+                char direction;     // Enum: Column using x-val, Row using y-val
+                uint16_t index;     // =1
+                uint16 magnitude;   // by 2
+                uint16 width;       // rect x value
+                uint16 height;      // rect y value
+            }
+        first word determines operation
+            if rect, new delimiter x
+                separate values into width and height
+            if rotate
+                determine direction
+                extract index and magnitude
+    
+    Functionality:
+    - Function to display all pixels of display
+    - Function to shift array using paramenters. rotate(Type=COLUMN, ORIGIN=3, MAGNITUDE=2); create_rekt(width=3 height=1);
+    - Function to count lit pixels
+    */
