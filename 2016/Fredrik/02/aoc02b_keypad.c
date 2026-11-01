@@ -32,24 +32,28 @@
  * @return 0 success, 1 failure or weird input
  */
 uint8_t startup(const char *file_name, uint64_t *code_length);
+
 /**
  * @brief Moves robotarm over keypad
  * @param pos position before movement, ex. '5'
  * @return position after movement, ex 'A'
  */
 char move_L(const char pos);
+
 /**
  * @brief Moves robotarm over keypad
  * @param pos position before movement, ex. '5'
  * @return position after movement, ex 'A'
  */
 char move_D(const char pos);
+
 /**
  * @brief Moves robotarm over keypad
  * @param pos position before movement, ex. '5'
  * @return position after movement, ex 'A'
  */
 char move_U(const char pos);
+
 /**
  * @brief Moves robotarm over keypad
  * @param pos position before movement, ex. '5'
