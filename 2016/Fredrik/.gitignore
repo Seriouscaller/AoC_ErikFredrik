@@ -6,5 +6,6 @@
 !*.c
 !*.h
 !.gitignore
-!*.txt
+# !*.txt had to remove for respect of author of aoc
 !*pseudo.md
+!*ramp-2016.sh

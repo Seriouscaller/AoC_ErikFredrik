@@ -161,7 +161,7 @@ I will not do that because its much more fun to go my route of fixing a shitty b
 ```
 until enough answer character found
     Write one file of indexes to be hashed, one million at a time.
-    Call the hasher on each line, write to new file.
+    Call the hasher on each line, write to new file. (where the hasher straight outputs to the new file)
     Look over the hashes with either c or grep.
 ```
 
