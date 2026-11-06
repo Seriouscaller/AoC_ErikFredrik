@@ -4,14 +4,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <ctype.h>
-#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day08/a/day08_input_sample.txt"
-//#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day08/a/day08_input_full.txt"
+//#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day08/a/day08_input_sample.txt"
+#define INPUT_FILE_NAME "C:/Users/ralli/Documents/Code/Github/AoC_ErikFredrik/2016/Erik/day08/a/day08_input_full.txt"
 #define NEWLINE '\n'
 #define WHITE_SPACE ' '
 #define LEFT_BRACKET '['
 #define RIGHT_BRACKET ']'
-#define RESOLUTION_WIDTH 6
-#define RESOLUTION_HEIGHT 5
+#define RESOLUTION_WIDTH 50
+#define RESOLUTION_HEIGHT 6
 #define MAX_LINE_LENGTH 100
 #define NUMBER_OF_RECT_DIMENSIONS 2
 
@@ -74,6 +74,27 @@ void print_arguments_from_instructions(struct instruction* instructions, uint16_
         printf("%c", NEWLINE);
     }
 };
+
+void print_instruction(struct instruction* instruction){
+    printf("Type: ");
+    switch (instruction->operation)
+    {
+    case RECT:
+        printf("REKT %ux%u%c", instruction->dimensions[0], instruction->dimensions[1], NEWLINE);
+        break;
+    case ROTATE_ROW:
+        printf("ROTATE_ROW Origin: %u Magnitude: %u%c", instruction->origin, instruction->magnitude, NEWLINE);
+        break;    
+    case ROTATE_COLUMN:
+        printf("ROTATE_COLUMN Origin: %u Magnitude: %u%c", instruction->origin, instruction->magnitude, NEWLINE);
+        break;    
+    default:
+        printf("NO-TYPE%c", NEWLINE);
+        break;
+    }
+
+
+}
 
 void print_instruction_array(struct instruction* instructions, uint16_t length){
     printf("## Instructions Array ##\n");
@@ -204,7 +225,7 @@ uint32_t count_pixels(uint16_t height, uint16_t width, uint8_t display_matrix[wi
     uint32_t number_of_lit_pixels = 0;
     for(int i = 0; i < height; i++){
         for(int j = 0; j < width; j++){
-            if(display_matrix[i][j] == ON){
+            if(display_matrix[j][i] == ON){
               number_of_lit_pixels++;
             } 
         }
@@ -221,7 +242,7 @@ void copy_pixels_onto_display(uint16_t height, uint16_t width, uint8_t display_m
         length = height;
     }
 
-    for(int i = 0; i < width; i++){
+    for(int i = 0; i < length; i++){
         if(type_of_shift == ROTATE_ROW){
             display_matrix[row_index][i] = pixel_array[i];
         }else{
@@ -353,30 +374,41 @@ int main(int argc, char *argv[]){
         }
     }
     print_instruction_array(instructions, file_info.rows);
-    
-    // Print out array of pixels
-    if(!rect(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, 3, 3)){
-        printf("Turning on pixels failed!%c", NEWLINE);
-    }else{
+
+    for(int k = 0; k < file_info.rows; k++){
+        printf("k:%d ", k);
+        if(0 < instructions[k].argc){
+            print_instruction(&instructions[k]);
+            switch (instructions[k].operation)
+            {
+            case RECT:
+                if(!rect(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, instructions[k].dimensions[0], instructions[k].dimensions[1])){
+                    printf("Turning on pixels failed!%c", NEWLINE);
+                }
+                break;
+            case ROTATE_ROW:
+                if(!shift_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, instructions[k].origin, instructions[k].magnitude, ROTATE_ROW)){
+                    printf("Failed to shift pixel-row!%c", NEWLINE);
+                }
+                break;
+            case ROTATE_COLUMN:
+                if(!shift_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, instructions[k].origin, instructions[k].magnitude, ROTATE_COLUMN)){
+                    printf("Failed to shift pixel-column!%c", NEWLINE);
+                }
+                break;
+            default:
+                printf("Invalid operation!%c", NEWLINE);
+                break;
+            };
+        }else{
+            printf("Too few arguments in instruction!%c", NEWLINE);
+        }
         display_all_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix);
     }
-
-    shift_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, 0, 1, ROTATE_ROW);
-    display_all_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix);
     
-    // Pixels must overflow into start if pushed off edge
-    //shift_row(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, 0, 4);
-    //shift_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, 0, 3, ROTATE_ROW);
-    //display_all_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix);
-    //shift_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix, 0, 2, ROTATE_COLUMN);
-    
-    /****** ERIKS PLAN ********
-    Functionality:
-    - Function to display all pixels of display
-    - Function to shift array using parameters. rotate(Type=COLUMN, ORIGIN=3, MAGNITUDE=2); create_rekt(width=3 height=1);
-    - Function to count lit pixels
-    */
     uint32_t number_of_lit_pixels = count_pixels(RESOLUTION_HEIGHT, RESOLUTION_WIDTH, display_matrix);
+
+    printf("Number of lit pixels: %lu\n", number_of_lit_pixels);
 
     free_allocation(instructions);
     free_allocation(puzzle_string);

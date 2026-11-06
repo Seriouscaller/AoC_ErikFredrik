@@ -1,4 +1,6 @@
-rect 3x2
-rotate column x=1 by 1
-rotate row y=0 by 4
-rotate column x=1 by 1
+rect 1x1
+rotate row y=0 by 10
+rect 1x1
+rotate row y=0 by 10
+rect 1x1
+rotate row y=0 by 5
