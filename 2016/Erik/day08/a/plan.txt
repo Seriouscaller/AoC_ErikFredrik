@@ -15,6 +15,7 @@
                 uint16 height;      // rect y value
             }
         first word determines operation
+        Check the number of arguments to make sure the operation is doable
             if rect, new delimiter x
                 separate values into width and height
             if rotate
@@ -23,6 +24,6 @@
     
     Functionality:
     - Function to display all pixels of display
-    - Function to shift array using paramenters. rotate(Type=COLUMN, ORIGIN=3, MAGNITUDE=2); create_rekt(width=3 height=1);
+    - Function to shift array using parameters. rotate(Type=COLUMN, ORIGIN=3, MAGNITUDE=2); create_rekt(width=3 height=1);
     - Function to count lit pixels
     */
